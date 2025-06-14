@@ -1,3 +1,9 @@
 {
-  "company_name": "CDW"
+  "company_name": "Wormy",
+  "experience_ranges": [
+    "30 years",
+    "5+ years",
+    "1+ year",
+    "1 year"
+  ]
 }

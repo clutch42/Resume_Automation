@@ -1,0 +1,27 @@
+{
+  "Programming/Scripting": [
+    "Python",
+    "C++",
+    "C#",
+    "Java",
+    "JavaScript",
+    "TypeScript",
+    "SQL"
+  ],
+  "Web Development": [
+    "HTML5",
+    "CSS",
+    "Angular",
+    "React",
+    "Node.js",
+    "Express.js",
+    "ASP.NET",
+    "Spring Boot"
+  ],
+  "Database Technologies": [
+    "MongoDB",
+    "SQLite",
+    "MySQL",
+    "PostgreSQL"
+  ]
+}
