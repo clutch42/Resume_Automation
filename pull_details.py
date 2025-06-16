@@ -95,22 +95,34 @@ def load_skills(filepath="skills.json"):
     
 def extract_skills_from_text(resume_text, skills_dict):
     found_skills = defaultdict(list)
-    
-    # Prepare cleaned word list from resume text
-    words = [clean_word(w).lower() for w in resume_text.split()]
-    
-    for category, skills in skills_dict.items():
-        for skill in skills:
-            skill_words = skill.lower().split()
-            skill_len = len(skill_words)
-            
-            # Slide over resume words and check consecutive matches
-            for i in range(len(words) - skill_len + 1):
-                if words[i:i + skill_len] == skill_words:
-                    found_skills[category].append(skill)
-                    break  # Found the skill, skip to next skill
-    
+    lowered_text = resume_text.lower()
+
+    # Tokenize and normalize text for simple matching
+    tokens = [w.strip('()",.:;') for w in lowered_text.split()]
+
+    for category, skill_items in skills_dict.items():
+        for item in skill_items:
+            # Handle both old (string) and new (dict with aliases) formats
+            if isinstance(item, str):
+                names_to_check = [item.lower()]
+                display_name = item
+            else:
+                names_to_check = [item["name"].lower()] + [alias.lower() for alias in item.get("aliases", [])]
+                display_name = item["name"]
+
+            for name in names_to_check:
+                # For multi-word skills like "Spring Boot"
+                if len(name.split()) > 1:
+                    if name in lowered_text:
+                        found_skills[category].append(display_name)
+                        break
+                else:
+                    if name in tokens:
+                        found_skills[category].append(display_name)
+                        break
+
     return dict(found_skills)
+
 
 def clean_word(word):
     # Characters to strip only at start or end
@@ -136,9 +148,31 @@ def main():
     else:
         print("No experience ranges detected.")
 
+    # Prompt to quit if experience doesn't match
+    response = input("Does the experience match your expectation? (y/n) ")
+    if response.lower() != 'y':
+        print("Exiting as per user input due to experience mismatch.")
+        return  # or sys.exit() if outside main()
+
+    # Prompt for professional title
+    print("Choose your professional title:")
+    print("1: Software Developer")
+    print("2: IT Professional")
+    print("Or enter any other title:")
+
+    title_input = input("Enter choice (1, 2, or title): ").strip()
+
+    if title_input == '1':
+        professional_title = "Software Developer"
+    elif title_input == '2':
+        professional_title = "IT Professional"
+    elif title_input == '':
+        professional_title = None  # default if nothing entered
+    else:
+        professional_title = title_input
+
     company_name = confirm_or_edit_company_name(company_name)
     skills_dict = load_skills()
-    print("Loaded skills dictionary:", skills_dict)
     matched_skills = extract_skills_from_text(text, skills_dict)
 
     print("Matched skills found:")
@@ -150,6 +184,7 @@ def main():
 
 
     output = {
+        "professional_title": professional_title,
         "company_name": company_name,
         "experience_ranges": experience_ranges if experience_ranges else None,
         "matched_skills": matched_skills if matched_skills else None

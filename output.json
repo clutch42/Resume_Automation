@@ -1,4 +1,5 @@
 {
+  "professional_title": "Software Developer",
   "company_name": "DataVox",
   "experience_ranges": [
     "30 years",
@@ -15,7 +16,11 @@
       "Spring Boot"
     ],
     "Database Technologies": [
-      "MongoDB"
+      "MongoDB",
+      "PostgreSQL"
+    ],
+    "new": [
+      "new2"
     ]
   }
 }

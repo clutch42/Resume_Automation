@@ -1,27 +1,120 @@
 {
   "Programming/Scripting": [
-    "Python",
-    "C++",
-    "C#",
-    "Java",
-    "JavaScript",
-    "TypeScript",
-    "SQL"
+    {
+      "name": "Python",
+      "aliases": [
+        "python3",
+        "py"
+      ]
+    },
+    {
+      "name": "C++",
+      "aliases": [
+        "cpp"
+      ]
+    },
+    {
+      "name": "C#",
+      "aliases": [
+        "csharp"
+      ]
+    },
+    {
+      "name": "Java",
+      "aliases": []
+    },
+    {
+      "name": "JavaScript",
+      "aliases": [
+        "js"
+      ]
+    },
+    {
+      "name": "TypeScript",
+      "aliases": [
+        "ts"
+      ]
+    },
+    {
+      "name": "SQL",
+      "aliases": []
+    }
   ],
   "Web Development": [
-    "HTML5",
-    "CSS",
-    "Angular",
-    "React",
-    "Node.js",
-    "Express.js",
-    "ASP.NET",
-    "Spring Boot"
+    {
+      "name": "HTML5",
+      "aliases": [
+        "html"
+      ]
+    },
+    {
+      "name": "CSS",
+      "aliases": []
+    },
+    {
+      "name": "Angular",
+      "aliases": []
+    },
+    {
+      "name": "React",
+      "aliases": [
+        "react.js",
+        "reactjs"
+      ]
+    },
+    {
+      "name": "Node.js",
+      "aliases": [
+        "node",
+        "nodejs"
+      ]
+    },
+    {
+      "name": "Express.js",
+      "aliases": [
+        "express"
+      ]
+    },
+    {
+      "name": "ASP.NET",
+      "aliases": [
+        "aspnet"
+      ]
+    },
+    {
+      "name": "Spring Boot",
+      "aliases": [
+        "springboot"
+      ]
+    }
   ],
   "Database Technologies": [
-    "MongoDB",
-    "SQLite",
-    "MySQL",
-    "PostgreSQL"
+    {
+      "name": "MongoDB",
+      "aliases": []
+    },
+    {
+      "name": "SQLite",
+      "aliases": []
+    },
+    {
+      "name": "MySQL",
+      "aliases": []
+    },
+    {
+      "name": "PostgreSQL",
+      "aliases": [
+        "postgres"
+      ]
+    }
+  ],
+  "new": [
+    {
+      "name": "new2",
+      "aliases": [
+        "hell",
+        "heell"
+      ]
+    }
   ]
 }
