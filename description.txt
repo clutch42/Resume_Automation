@@ -131,7 +131,8 @@ Work involves standing, talking, hearing, using hands to touch, handle, feel, or
 DataVox, Inc. is an equal opportunity employer.
 
 Featured benefits
-
+express.js
+mongodb
 Medical insurance
 Vision insurance
 Dental insurance
@@ -141,7 +142,8 @@ About the company
 DataVox company logo
 DataVox
 10,584 followers
-
+C++
 Follow
+Spring Boot
 IT Services and IT Consulting  201-500 employees  289 on LinkedIn
 DataVox is a Houston TX based business technology company since 1990 with additional offices in the Dallas & Fort Worth area. We specialize in Managed IT Services, audio visual solutions, phone systems, network cabling, data center solutions, network infrastructure, cloud solutions, Microsoft Cloud Solu

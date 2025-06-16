@@ -1,7 +1,7 @@
 import spacy
 import re
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -89,6 +89,36 @@ def confirm_or_edit_company_name(detected_name):
         else:
             print("Let's try again.\n")
 
+def load_skills(filepath="skills.json"):
+    with open(filepath, "r", encoding="utf-8") as f:
+        return json.load(f)
+    
+def extract_skills_from_text(resume_text, skills_dict):
+    found_skills = defaultdict(list)
+    
+    # Prepare cleaned word list from resume text
+    words = [clean_word(w).lower() for w in resume_text.split()]
+    
+    for category, skills in skills_dict.items():
+        for skill in skills:
+            skill_words = skill.lower().split()
+            skill_len = len(skill_words)
+            
+            # Slide over resume words and check consecutive matches
+            for i in range(len(words) - skill_len + 1):
+                if words[i:i + skill_len] == skill_words:
+                    found_skills[category].append(skill)
+                    break  # Found the skill, skip to next skill
+    
+    return dict(found_skills)
+
+def clean_word(word):
+    # Characters to strip only at start or end
+    to_strip = '(),.:;'
+
+    # Strip from start and end
+    return word.strip(to_strip)
+
 def main():
     with open("description.txt", "r", encoding="utf-8") as f:
         text = f.read()
@@ -107,10 +137,22 @@ def main():
         print("No experience ranges detected.")
 
     company_name = confirm_or_edit_company_name(company_name)
+    skills_dict = load_skills()
+    print("Loaded skills dictionary:", skills_dict)
+    matched_skills = extract_skills_from_text(text, skills_dict)
+
+    print("Matched skills found:")
+    if matched_skills:
+        for category, skills in matched_skills.items():
+            print(f"{category}: {', '.join(skills)}")
+    else:
+        print("No skills matched.")
+
 
     output = {
         "company_name": company_name,
-        "experience_ranges": experience_ranges if experience_ranges else None
+        "experience_ranges": experience_ranges if experience_ranges else None,
+        "matched_skills": matched_skills if matched_skills else None
     }
 
     with open("output.json", "w", encoding="utf-8") as outfile:
