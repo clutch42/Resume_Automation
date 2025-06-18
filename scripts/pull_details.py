@@ -3,10 +3,22 @@ import re
 import json
 from collections import Counter, defaultdict
 from resume_creator import generate_resume
+from utils import load_skills
 
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
+
+def load_professional_titles():
+    try:
+        with open("../data/summaries.json", "r", encoding="utf-8") as f:
+            summary_map = json.load(f)
+        # Exclude "default" from choices
+        titles = [title for title in summary_map.keys() if title.lower() != "default"]
+        return titles
+    except Exception as e:
+        print(f"Error loading professional titles: {e}")
+        return []
 
 # Helper to clean company names
 def clean_name(name):
@@ -91,9 +103,9 @@ def confirm_or_edit_company_name(detected_name):
         else:
             print("Let's try again.\n")
 
-def load_skills(filepath="../data/skills.json"):
-    with open(filepath, "r", encoding="utf-8") as f:
-        return json.load(f)
+#def load_skills(filepath="../data/skills.json"):
+#    with open(filepath, "r", encoding="utf-8") as f:
+#        return json.load(f)
     
 def extract_skills_from_text(resume_text, skills_dict):
     found_skills = defaultdict(list)
@@ -157,19 +169,22 @@ def main():
         return  # or sys.exit() if outside main()
 
     # Prompt for professional title
-    print("Choose your professional title:")
-    print("1: Software Developer")
-    print("2: IT Professional")
-    print("Or enter any other title:")
+    titles = load_professional_titles()
+    print("Choose your professional title from the list, or enter any other title:")
+    for idx, title in enumerate(titles, 1):
+        print(f"{idx}: {title}")
 
-    title_input = input("Enter choice (1, 2, or title): ").strip()
+    title_input = input(f"Enter choice (1-{len(titles)}) or type a title: ").strip()
 
-    if title_input == '1':
-        professional_title = "Software Developer"
-    elif title_input == '2':
-        professional_title = "IT Professional"
+    if title_input.isdigit():
+        idx = int(title_input)
+        if 1 <= idx <= len(titles):
+            professional_title = titles[idx - 1]
+        else:
+            print("Invalid number choice. Using default None.")
+            professional_title = None
     elif title_input == '':
-        professional_title = None  # default if nothing entered
+        professional_title = None
     else:
         professional_title = title_input
 
