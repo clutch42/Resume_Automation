@@ -1,0 +1,5 @@
+{
+  "Software Developer": "summaries/software_developer.txt",
+  "IT Professional": "summaries/it_professional.txt",
+  "default": "summaries/default.txt"
+}

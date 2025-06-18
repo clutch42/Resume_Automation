@@ -2,6 +2,8 @@ import spacy
 import re
 import json
 from collections import Counter, defaultdict
+from resume_creator import generate_resume
+
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -89,7 +91,7 @@ def confirm_or_edit_company_name(detected_name):
         else:
             print("Let's try again.\n")
 
-def load_skills(filepath="skills.json"):
+def load_skills(filepath="../data/skills.json"):
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
     
@@ -132,7 +134,7 @@ def clean_word(word):
     return word.strip(to_strip)
 
 def main():
-    with open("description.txt", "r", encoding="utf-8") as f:
+    with open("../description.txt", "r", encoding="utf-8") as f:
         text = f.read()
 
     company_name = get_most_common_company(text)
@@ -190,8 +192,11 @@ def main():
         "matched_skills": matched_skills if matched_skills else None
     }
 
-    with open("output.json", "w", encoding="utf-8") as outfile:
+    with open("../output/output.json", "w", encoding="utf-8") as outfile:
         json.dump(output, outfile, indent=2)
+
+    generate_resume("../output/output.json", "../resumes/my_resume.pdf")
+    
 
 if __name__ == "__main__":
     main()

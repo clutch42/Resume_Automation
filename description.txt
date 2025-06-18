@@ -1,27 +1,27 @@
-DataVox logo
-DataVox
+DS Systems logo
+DS Systems
 Share
 Show more options
-Junior System Administrator
-Houston, TX · 2 weeks ago · Over 100 people clicked apply
+IT Intern
+Washington, DC · 1 day ago · Over 100 people clicked apply
 Promoted by hirer · Responses managed off LinkedIn
 
 
- $70K/yr - $80K/yrMatches your job preferences, minimum pay preference is 60000.
- On-siteMatches your job preferences, workplace type is On-site.
- Full-timeMatches your job preferences, job type is Full-time.
+ RemoteMatches your job preferences, workplace type is Remote.
+Internship
+3 of 10 skills match: HTML, Problem Solving, Communication3 of 10 required skills are found on your profile, matched skills include: HTML, Problem Solving, Communication
 
 Apply
 
 Save
-Save Junior System Administrator at DataVox
-Junior System Administrator
-DataVox · Houston, TX (On-site)
+Save IT Intern at DS Systems
+IT Intern
+DS Systems · Washington, DC (Remote)
 
 Apply
 
 Save
-Save Junior System Administrator at DataVox
+Save IT Intern at DS Systems
 Show more options
 How your profile and resume fit this job
 Get AI-powered advice on this job and more exclusive features with Premium. Try Premium for $0
@@ -34,118 +34,62 @@ Am I a good fit for this job?
 
 How can I best position myself for this job?
 
-Meet the hiring team
-Paul Morss is hiring
-Paul Morss  
- 3rd
-Veteran & Talent Acquisition Specialist | Exercise & Baking Aficionado
-Job poster
-
-Message
 About the job
-Jr System Admin
+REMOTE IT INTERNSHIP
+
+
+Note: This internship is independent from any federal contracts or client projects. Interns will work on simulated, portfolio-ready projects created by DS Systems. This program is best suited for college students looking to gain experience, build real-world tech projects, and operate in a remote, corporate-style environment designed for early-career growth.
+Status: Unpaid
+Location: Remote (U.S.-based applicants only)
+Duration: 5 Weeks
+Eligibility: Must be enrolled in a 2-year associate’s or 4-year undergraduate program
+
+
+About the Program
+The DS Systems Internship Program is a hands-on, portfolio-driven opportunity designed for college students pursuing careers in technology, cybersecurity, government consulting, or federal IT.
+Over five weeks, interns will complete five guided projects—one each week—ranging from coding and data visualization to real-world IT strategy simulations. Each project is added to a public portfolio page hosted on our website, giving interns a platform to showcase their work to future employers.
+This is more than just a resume-builder. It’s a launchpad.
+
+
+What You’ll Gain
+✅ 5 real projects to showcase publicly in a professional portfolio
+✅ Mentorship from senior professionals in government contracting
+✅ LinkedIn referrals & recommendation letters upon successful completion
+✅ Brand-building support for your future in tech or federal consulting
+✅ Featured profile on the DS Systems website
+✅ College credit compatibility (check with your school advisor for transfer eligibility)
+✅ Networking opportunities in the federal technology space
+
+
+Qualifications
+Must be actively enrolled in a U.S.-based 2-year associate or 4-year undergraduate program (any major welcome, tech interest preferred)
+Strong written communication and time management
+Passion for technology, problem solving, and innovation
+No prior federal experience required — just curiosity and commitment
+
+
+APPLICATION DEADLINE IS JULY 25th
+
+Job search faster with Premium
+Access company insights like strategic priorities, headcount trends, and more
 
 
 
-DataVox is searching for a talented Jr System Admin to join our Managed Services team in Houston!
 
+Snizhana and millions of other members use Premium
 
-Before learning more about the position, let us tell you a bit more about who we are! DataVox has been serving the Texas Triangle area for over 30 years with our advanced technology solutions. We specialize in Audio Visual Solutions, Data Center & Network Technologies, IT Support Services, Network Cabling, Phone Systems & Physical Security. We are committed to being the best technology partner and ensure the highest level of expertise and quality service by having people like you on our team.
+Try Premium for $0
+1-month free trial. Cancel whenever. We’ll remind you 7 days before your trial ends.
 
-
-We want our company to be a place you will want to be – and stay. Employees at DataVox are offered the following:
-An amazing atmosphere to challenge yourself and grow career!
-Comprehensive health, vision and dental insurance for you and your dependents
-Company paid life insurance and long-term disability insurance
-401(k) and Roth retirement plan with company match
-Sponsored 529 College Savings Plan
-Professional development reimbursement
-Employee Assistance Program
-Paid vacation and sick time
-Paid company holidays
-Annual Health and Wellness Fairs
-Virtual and in-person team & company events – Ice Cream Social, Employee Appreciation Day, Halloween contests, Thanksgiving potluck, Holiday parties, “Support our team” days, Texans, Astros, and Dinamo watch parties, and more!
-Mileage and phone reimbursement
-Opportunity to make decisions that positively impact the environment through sustainable business practices.
-Employee engagement clubs
-New Employee Buddy/CHAMPION Program
-
-
-What You’ll Do:
-As a Jr System Admin, you will be part of DataVox’s Managed Services team who provides Tier II/III technical support for our clients. You will respond to end-user calls/trouble reports and provide top-notch service and support to troubleshoot the nature of the problem and take the necessary course of action to resolve it.
-Diagnose problems via phone, email, and on-site utilizing troubleshooting skills, logic, research, and isolation steps.
-Support Microsoft Windows server technologies including but not limited to file servers, DNS and Active Directory, and virtualization platforms.
-VMware/Hyper-V, experienced in management of virtual hosts.
-Provide Tier 2-3 desktop and application support, including new user setups, vendor management.
-Work under minimal direction to independently determine and develop approaches to solutions, while preserving Change Management controls.
-Record all client inquiries, from initial call to incident resolution in Ticketing system.
-Perform on-site troubleshooting of hardware, network, and software.
-Perform new software/hardware installations, configurations, and upgrades.
-Build and deploy workstation images using RMM software.
-Provide support for Office 365 and administration.
-Install and configure Broadband Internet modems, internal LAN Routers, Switches, NAS devices, and Wi-Fi.
-Use RMM software to diagnose automation, troubleshoot, and resolve issues.
-Responding to associate service calls to troubleshoot the nature of reported problems and taking necessary steps to resolve those problems.
-Troubleshoot issues with desktops, laptops, mobile devices, printers, and copiers onsite and remotely.
-Ability to understand and articulate root cause of customer issues.
-Collaborate closely with the team to resolve or properly close aging tickets.
-Manage individual queue of tickets and respond, document, and close in a timely manner.
-Availability to provide emergency support during nights, weekends, and holidays.
-Assist during LAN /WAN related projects, and service incidents.
-Communicate with vendors on network requirements & troubleshooting efforts.
-Document, track, and monitor network related problems to ensure a timely resolution.
-Provide initiative-taking maintenance and documentation upkeep of network infrastructure.
-Operations level involvement in planning, implementing, and supporting network solutions for existing and new clients.
-
-
-What You Need:
-Associate or bachelor’s degree in computer science, IT, Engineering, Science, or related field is a plus.
-5+ years of providing desktop support with some in Level 2 or System Admin.
-2+ relevant professional certification (HDI-DST, MCSA, CompTIA A+).
-Firm understanding of network fundamentals, LAN/WAN technologies, and network infrastructure services (DNS, DHCP, Radius, Syslog) -- both from an initiative-taking & reactive perspective.
-Must have 1+ year of experience providing Help Desk support.
-1 year of desktop-based hardware support experience with Mac OS X and Windows 7.
-Knowledge of VPN technologies (L2L, Remote VPN, PPTP, Client VPN).
-Working experience with WAN technologies (MEtroE, VPLS, PTP links and MPLS).
-Experience removing viruses/malware/spyware & prevention.
-Experience working with Active Directory Server 2008/2012.
-Experience installing, troubleshooting, configuring, updating, and maintaining Windows OS.
-Knowledge and experience of troubleshooting and setup of computer hardware.
-Use of RMM software/backup/imaging software/ticket system.
-Use of imaging & backup software.
-Clear theoretical understanding of networks, including LAN/WAN/VPN, routers, switches, and servers.
-Networking experience in troubleshooting connectivity issues, DHCP, and DNS.
-Understanding of QOS technologies (L2 QOS, L3 QOS, LLQ, CBWFQ, Policing, Traffic Shaping etc.)
-Excellent oral and written communication skills, including the ability to interact with people at various levels.
-Ability to work well under pressure, multi-task, facilitate solutions, and meet deadlines and milestones for projects as assigned.
-Ability to perform advanced troubleshooting of network devices and peripherals.
-Self-motivated with the ability to follow directions, complete time-sensitive tasks, and meet deadlines with minimal supervision in a fast-paced, high stress environment.
-Strong planning and organizational skills, with the ability to document processes and procedures.
-Enthusiastic about providing excellent customer service and follow-through to completion.
-
-
-Physical Demands:
-Work involves standing, talking, hearing, using hands to touch, handle, feel, or operate objects, tools, or controls and reaching with hands and arms. The employee is frequently required to walk, sit, climb, balance, stand, stoop, kneel, drive and reach. Skill in operation of some of the listed tools and equipment, and ability to perform heavy manual tasks for extended periods of time. The employee must frequently push, pull, lift, and/or carry up to 50 pounds and occasionally push, pull, lift and/or carry up to 100 pounds. Specific vision abilities required by this job include close vision, distance vision, color vision, peripheral vision, depth perception, and the ability to adjust focus.
-
-
-DataVox, Inc. is an equal opportunity employer.
-
-Featured benefits
-express.js
-mongodb
-Medical insurance
-Vision insurance
-Dental insurance
-401(k)
-Disability insurance
 About the company
-DataVox company logo
-DataVox
-10,584 followers
-C++
+DS Systems company logo
+DS Systems
+16 followers
+
 Follow
-Spring Boot
-postgres
-new2
-IT Services and IT Consulting  201-500 employees  289 on LinkedIn
-DataVox is a Houston TX based business technology company since 1990 with additional offices in the Dallas & Fort Worth area. We specialize in Managed IT Services, audio visual solutions, phone systems, network cabling, data center solutions, network infrastructure, cloud solutions, Microsoft Cloud Solu
+IT Services and IT Consulting  2-10 employees  2 on LinkedIn
+DS Systems, LLC is an Information Technology services company, serving Washington DC area. we are committed to delivering innovative solutions that meets the needs of our clients. Everything we do is built on a commitment to do the right thing for our customers, our people and our community. Our mission, vision, and values guide the way we do business.
+…
+show more
+
+Show more

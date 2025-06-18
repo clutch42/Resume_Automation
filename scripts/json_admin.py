@@ -251,7 +251,11 @@ class SkillManagerApp:
         self.refresh_aliases(self.last_selected_category, self.last_selected_skill_index)
 
     def load_json(self):
-        path = filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        project_dir = os.path.dirname(script_dir)
+        data_dir = os.path.join(project_dir, "data")
+        os.makedirs(data_dir, exist_ok=True)
+        path = filedialog.askopenfilename(initialdir=data_dir, filetypes=[("JSON Files", "*.json")])
         if not path:
             return
         try:
@@ -269,7 +273,11 @@ class SkillManagerApp:
             messagebox.showerror("Error", str(e))
 
     def save_json(self):
-        path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON Files", "*.json")])
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        project_dir = os.path.dirname(script_dir)
+        data_dir = os.path.join(project_dir, "data")
+        os.makedirs(data_dir, exist_ok=True)
+        path = filedialog.asksaveasfilename(initialdir=data_dir, defaultextension=".json", filetypes=[("JSON Files", "*.json")])
         if not path:
             return
         try:
@@ -283,7 +291,10 @@ class SkillManagerApp:
     def autosave(self):
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
-            path = os.path.join(script_dir, "skills_autosave.json")
+            project_dir = os.path.dirname(script_dir)  # go up one level to project root
+            data_dir = os.path.join(project_dir, "data")  # correct data folder path
+            os.makedirs(data_dir, exist_ok=True)
+            path = os.path.join(data_dir, "skills_autosave.json")
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(self.skills, f, indent=2)
             print(f"Autosaved to {path}")

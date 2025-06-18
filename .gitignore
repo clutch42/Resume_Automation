@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.spec
+build/
+dist/
+*.log
+*.env
+output.json
+my_resume.pdf
+test_resume.pdf

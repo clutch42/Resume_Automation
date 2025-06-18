@@ -107,14 +107,5 @@
         "postgres"
       ]
     }
-  ],
-  "new": [
-    {
-      "name": "new2",
-      "aliases": [
-        "hell",
-        "heell"
-      ]
-    }
   ]
 }
