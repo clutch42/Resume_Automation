@@ -1,0 +1,51 @@
+{
+  "projects_page_url": "https://thebrianengel.com/projects",
+  "projects": [
+    {
+      "name": "Portfolio Website",
+      "url": null,
+      "details": [
+        "Built and deployed a portfolio site with automated CI/CD and AWS static hosting.",
+        "Configured HTTPS and custom domain using AWS CloudFront and Route 53.",
+        "Tech: Vite, React, TypeScript, GitHub Actions, AWS S3, CloudFront, Route 53, Node.js"
+      ]
+    },
+    {
+      "name": "MEAN Stack Full-Stack Conversion, SNHU",
+      "url": null,
+      "details": [
+        "Rebuilt a static site into a dynamic full-stack app with MongoDB, Node, Express, and Angular.",
+        "Created RESTful APIs and admin interface for content management.",
+        "Tech: MongoDB, Express.js, Angular, Node.js, Mongoose, Handlebars, HTML/CSS"
+      ]
+    },
+    {
+      "name": "OpenGL 3D Scene, SNHU",
+      "url": null,
+      "details": [
+        "Developed a 3D scene using C++ and OpenGL with custom geometry and shaders.",
+        "Implemented lighting, textures, and object transformations via the programmable pipeline.",
+        "Tech: C++, OpenGL, GLFW, GLEW"
+      ]
+    },
+    {
+      "name": "Computer Science Capstone, SNHU",
+      "url": "https://www.google.com/",
+      "details": [
+        "Improved projects by refactoring code, optimizing algorithms, and securing database queries.",
+        "Upgraded BST to AVL tree and modularized OpenGL graphics code.",
+        "Tech: C++, SQL, SQLite, OpenGL, HTML, CSS, JavaScript"
+      ]
+    },
+    {
+      "name": "Simplifying a Radical – WebAssembly App",
+      "url": null,
+      "details": [
+        "Created a math app combining C++ logic compiled to WebAssembly for in-browser use.",
+        "Built a simple frontend and hosted on Render for easy access.",
+        "Tech: C++, JavaScript, WebAssembly, HTML/CSS, Emscripten, Node.js, Render"
+      ]
+    }
+  ]
+}
+
