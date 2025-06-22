@@ -5,7 +5,7 @@ import os
 from personal_info_tab import PersonalInfoTab
 from skills_tab import SkillsTab
 from certifications_tab import CertificationsTab
-
+from education_tab import EducationTab
 
 class SkillManagerApp:
     def __init__(self, root):
@@ -20,15 +20,11 @@ class SkillManagerApp:
         self.notebook = ttk.Notebook(main_frame)
         self.notebook.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # Create Personal Info tab
+        # Create Tabs
         self.personal_info_tab = PersonalInfoTab(self.notebook)
-
-        # Create Skills tab
         self.skills_tab = SkillsTab(self.notebook)
-
-        # Create Certifications tab
         self.certifications_tab = CertificationsTab(self.notebook)
-
+        self.education_tab = EducationTab(self.notebook)
 
         # Bottom buttons for saving/loading all tabs
         bottom_buttons = tk.Frame(main_frame)
@@ -79,7 +75,17 @@ class SkillManagerApp:
                     self.certifications_tab.current_file = cert_path
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load certifications.json:\n{e}")
-
+            
+        # Load education
+        edu_path = os.path.join(folder, "education.json")
+        if os.path.exists(edu_path):
+            try:
+                with open(edu_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    self.education_tab.load_data(data)
+                    self.education_tab.current_file = edu_path
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to load education.json:\n{e}")
 
     def save_all(self):
         # Save personal info
@@ -119,6 +125,17 @@ class SkillManagerApp:
                 messagebox.showerror("Error", f"Failed to save certifications.json:\n{e}")
         else:
             print("No certifications.json file loaded, skipping save.")
+
+        # Save education
+        if hasattr(self.education_tab, 'current_file') and self.education_tab.current_file:
+            try:
+                with open(self.education_tab.current_file, "w", encoding="utf-8") as f:
+                    json.dump(self.education_tab.get_data(), f, indent=2)
+                print(f"Education saved to {self.education_tab.current_file}")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to save education.json:\n{e}")
+        else:
+            print("No education.json file loaded, skipping save.")
 
 
     def create_new_user(self):
@@ -163,12 +180,23 @@ class SkillManagerApp:
             with open(certifications_path, "w", encoding="utf-8") as f:
                 json.dump([], f, indent=2)
 
+            # Create empty education.json
+            education_path = os.path.join(user_folder, "education.json")
+            with open(education_path, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=2)  # assuming education data is a list
+
             # Load these new empty files into the app
             self.personal_info_tab.load_data({})
             self.personal_info_tab.current_file = personal_info_path
 
             self.skills_tab.load_data({})
             self.skills_tab.current_file = skills_path
+
+            self.certifications_tab.load_data({})
+            self.certifications_tab.current_file = certifications_path
+
+            self.education_tab.load_data([])
+            self.education_tab.current_file = education_path
 
             messagebox.showinfo("Success", f"New user '{user_name}' created and loaded.")
 
