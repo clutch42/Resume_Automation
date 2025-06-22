@@ -4,6 +4,8 @@ import json
 import os
 from personal_info_tab import PersonalInfoTab
 from skills_tab import SkillsTab
+from certifications_tab import CertificationsTab
+
 
 class SkillManagerApp:
     def __init__(self, root):
@@ -23,6 +25,10 @@ class SkillManagerApp:
 
         # Create Skills tab
         self.skills_tab = SkillsTab(self.notebook)
+
+        # Create Certifications tab
+        self.certifications_tab = CertificationsTab(self.notebook)
+
 
         # Bottom buttons for saving/loading all tabs
         bottom_buttons = tk.Frame(main_frame)
@@ -62,6 +68,18 @@ class SkillManagerApp:
                     self.skills_tab.current_file = skills_path
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load skills.json:\n{e}")
+        
+        # Load certifications
+        cert_path = os.path.join(folder, "certifications.json")
+        if os.path.exists(cert_path):
+            try:
+                with open(cert_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    self.certifications_tab.load_data(data)
+                    self.certifications_tab.current_file = cert_path
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to load certifications.json:\n{e}")
+
 
     def save_all(self):
         # Save personal info
@@ -90,6 +108,18 @@ class SkillManagerApp:
             print("No skills.json file loaded, skipping save.")
 
         messagebox.showinfo("Save Complete", "All data saved successfully.")
+
+        # Save certifications
+        if self.certifications_tab.current_file:
+            try:
+                with open(self.certifications_tab.current_file, "w", encoding="utf-8") as f:
+                    json.dump(self.certifications_tab.certifications, f, indent=2)
+                print(f"Certifications saved to {self.certifications_tab.current_file}")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to save certifications.json:\n{e}")
+        else:
+            print("No certifications.json file loaded, skipping save.")
+
 
     def create_new_user(self):
         # Ask for the new user name
@@ -127,6 +157,11 @@ class SkillManagerApp:
             skills_path = os.path.join(user_folder, "skills.json")
             with open(skills_path, "w", encoding="utf-8") as f:
                 json.dump({}, f, indent=2)
+
+            # Create empty certifications.json
+            certifications_path = os.path.join(user_folder, "certifications.json")
+            with open(certifications_path, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=2)
 
             # Load these new empty files into the app
             self.personal_info_tab.load_data({})
