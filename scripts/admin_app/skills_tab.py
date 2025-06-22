@@ -3,63 +3,65 @@ from tkinter import messagebox, simpledialog, filedialog
 import json
 import os
 
-class SkillManagerApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Skill Categories Manager")
+class SkillsTab:
+    def __init__(self, notebook):
+        self.frame = tk.Frame(notebook)
+        notebook.add(self.frame, text="Skills")
 
-        self.skills = {}  # {category: [ {name, aliases} ]}
+        self.skills = {}
         self.current_file = None
         self.last_selected_category = None
         self.last_selected_skill_index = None
         self.last_selected_skill = None
 
-        # Left frame: Categories
-        left_frame = tk.Frame(root)
+        self.build_ui()
+
+    def build_ui(self):
+        # Left: Categories
+        left_frame = tk.Frame(self.frame)
         left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=10)
 
         tk.Label(left_frame, text="Categories").pack()
-        self.category_listbox = tk.Listbox(left_frame, width=40, exportselection=False)
+        self.category_listbox = tk.Listbox(left_frame, width=25, exportselection=False)
         self.category_listbox.pack(fill=tk.Y, expand=True)
         self.category_listbox.bind("<<ListboxSelect>>", self.on_category_select)
 
-        btn_frame = tk.Frame(left_frame)
-        btn_frame.pack(pady=5)
-        tk.Button(btn_frame, text="Add Category", command=self.add_category).pack(side=tk.LEFT)
-        tk.Button(btn_frame, text="Delete Category", command=self.delete_category).pack(side=tk.LEFT)
-        tk.Button(btn_frame, text="Rename Category", command=self.rename_category).pack(side=tk.LEFT)
+        cat_btn_frame = tk.Frame(left_frame)
+        cat_btn_frame.pack(pady=5)
+        tk.Button(cat_btn_frame, text="Add", command=self.add_category).pack(side=tk.LEFT)
+        tk.Button(cat_btn_frame, text="Delete", command=self.delete_category).pack(side=tk.LEFT)
+        tk.Button(cat_btn_frame, text="Rename", command=self.rename_category).pack(side=tk.LEFT)
 
-        # Right frame: Skills and Aliases
-        right_frame = tk.Frame(root)
-        right_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+        # Middle: Skills
+        mid_frame = tk.Frame(self.frame)
+        mid_frame.pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=10)
 
-        tk.Label(right_frame, text="Skills in Category").pack()
-        self.skills_listbox = tk.Listbox(right_frame, width=40, exportselection=False)
-        self.skills_listbox.pack(fill=tk.BOTH, expand=True)
+        tk.Label(mid_frame, text="Skills").pack()
+        self.skills_listbox = tk.Listbox(mid_frame, width=30, exportselection=False)
+        self.skills_listbox.pack(fill=tk.Y, expand=True)
         self.skills_listbox.bind("<<ListboxSelect>>", self.on_skill_select)
 
-        skills_btn_frame = tk.Frame(right_frame)
-        skills_btn_frame.pack(pady=5)
-        tk.Button(skills_btn_frame, text="Add Skill", command=self.add_skill).pack(side=tk.LEFT)
-        tk.Button(skills_btn_frame, text="Delete Skill", command=self.delete_skill).pack(side=tk.LEFT)
-        tk.Button(skills_btn_frame, text="Rename Skill", command=self.rename_skill).pack(side=tk.LEFT)
+        skill_btn_frame = tk.Frame(mid_frame)
+        skill_btn_frame.pack(pady=5)
+        tk.Button(skill_btn_frame, text="Add", command=self.add_skill).pack(side=tk.LEFT)
+        tk.Button(skill_btn_frame, text="Delete", command=self.delete_skill).pack(side=tk.LEFT)
+        tk.Button(skill_btn_frame, text="Rename", command=self.rename_skill).pack(side=tk.LEFT)
 
-        tk.Label(right_frame, text="Aliases for Selected Skill").pack()
-        self.aliases_listbox = tk.Listbox(right_frame, width=40)
+        # Right: Aliases
+        right_frame = tk.Frame(self.frame)
+        right_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        tk.Label(right_frame, text="Aliases").pack()
+        self.aliases_listbox = tk.Listbox(right_frame)
         self.aliases_listbox.pack(fill=tk.BOTH, expand=True)
 
         alias_btn_frame = tk.Frame(right_frame)
         alias_btn_frame.pack(pady=5)
-        tk.Button(alias_btn_frame, text="Add Alias", command=self.add_alias).pack(side=tk.LEFT)
-        tk.Button(alias_btn_frame, text="Delete Alias", command=self.delete_alias).pack(side=tk.LEFT)
-        tk.Button(alias_btn_frame, text="Rename Alias", command=self.rename_alias).pack(side=tk.LEFT)
+        tk.Button(alias_btn_frame, text="Add", command=self.add_alias).pack(side=tk.LEFT)
+        tk.Button(alias_btn_frame, text="Delete", command=self.delete_alias).pack(side=tk.LEFT)
+        tk.Button(alias_btn_frame, text="Rename", command=self.rename_alias).pack(side=tk.LEFT)
 
-        # Bottom: Load/Save
-        bottom_frame = tk.Frame(root)
-        bottom_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
-        tk.Button(bottom_frame, text="Load JSON", command=self.load_json).pack(side=tk.LEFT, padx=5)
-        tk.Button(bottom_frame, text="Save JSON", command=self.save_json).pack(side=tk.LEFT, padx=5)
-
+    # === Category Methods ===
     def add_category(self):
         new_cat = simpledialog.askstring("Add Category", "Enter new category name:")
         if new_cat:
@@ -88,6 +90,29 @@ class SkillManagerApp:
             self.aliases_listbox.delete(0, tk.END)
             self.autosave()
 
+    def rename_category(self):
+        sel = self.category_listbox.curselection()
+        if not sel:
+            messagebox.showinfo("Info", "Select a category to rename.")
+            return
+        old_cat = self.category_listbox.get(sel[0])
+        new_cat = simpledialog.askstring("Rename Category", f"Rename '{old_cat}' to:")
+        if new_cat:
+            new_cat = new_cat.strip()
+            if new_cat == old_cat:
+                return
+            if new_cat in self.skills:
+                messagebox.showerror("Error", "Category already exists.")
+                return
+            self.skills[new_cat] = self.skills.pop(old_cat)
+            self.refresh_categories()
+            idx = list(sorted(self.skills.keys())).index(new_cat)
+            self.category_listbox.selection_clear(0, tk.END)
+            self.category_listbox.selection_set(idx)
+            self.on_category_select()
+            self.autosave()
+
+    # === Skill Methods ===
     def add_skill(self):
         sel = self.category_listbox.curselection()
         if not sel:
@@ -136,6 +161,7 @@ class SkillManagerApp:
             self.skills_listbox.selection_set(self.last_selected_skill_index)
             self.autosave()
 
+    # === Alias Methods ===
     def add_alias(self):
         if self.last_selected_category is None or self.last_selected_skill_index is None:
             messagebox.showinfo("Info", "Select a skill first.")
@@ -190,28 +216,7 @@ class SkillManagerApp:
             self.refresh_aliases(cat, self.last_selected_skill_index)
             self.autosave()
 
-    def rename_category(self):
-        sel = self.category_listbox.curselection()
-        if not sel:
-            messagebox.showinfo("Info", "Select a category to rename.")
-            return
-        old_cat = self.category_listbox.get(sel[0])
-        new_cat = simpledialog.askstring("Rename Category", f"Rename '{old_cat}' to:")
-        if new_cat:
-            new_cat = new_cat.strip()
-            if new_cat == old_cat:
-                return
-            if new_cat in self.skills:
-                messagebox.showerror("Error", "Category already exists.")
-                return
-            self.skills[new_cat] = self.skills.pop(old_cat)
-            self.refresh_categories()
-            idx = list(sorted(self.skills.keys())).index(new_cat)
-            self.category_listbox.selection_clear(0, tk.END)
-            self.category_listbox.selection_set(idx)
-            self.on_category_select()
-            self.autosave()
-
+    # === Refresh + Event ===
     def refresh_categories(self):
         self.category_listbox.delete(0, tk.END)
         for cat in sorted(self.skills.keys()):
@@ -236,73 +241,62 @@ class SkillManagerApp:
         cat = self.category_listbox.get(sel[0])
         self.last_selected_category = cat
         self.last_selected_skill_index = None
+        self.last_selected_skill = None
         self.refresh_skills(cat)
         self.aliases_listbox.delete(0, tk.END)
 
     def on_skill_select(self, event=None):
-        skill_sel = self.skills_listbox.curselection()
-        cat_sel = self.category_listbox.curselection()
-        if not cat_sel or not skill_sel:
+        sel = self.skills_listbox.curselection()
+        if not sel:
             self.aliases_listbox.delete(0, tk.END)
+            self.last_selected_skill_index = None
+            self.last_selected_skill = None
             return
-        self.last_selected_category = self.category_listbox.get(cat_sel[0])
-        self.last_selected_skill_index = skill_sel[0]
-        self.last_selected_skill = self.skills[self.last_selected_category][self.last_selected_skill_index]
-        self.refresh_aliases(self.last_selected_category, self.last_selected_skill_index)
+        idx = sel[0]
+        cat = self.last_selected_category
+        self.last_selected_skill_index = idx
+        self.last_selected_skill = self.skills[cat][idx]["name"]
+        self.refresh_aliases(cat, idx)
 
-    def load_json(self):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        project_dir = os.path.dirname(script_dir)
-        data_dir = os.path.join(project_dir, "data")
-        os.makedirs(data_dir, exist_ok=True)
-        path = filedialog.askopenfilename(initialdir=data_dir, filetypes=[("JSON Files", "*.json")])
-        if not path:
+    def load_data(self, data):
+        if not isinstance(data, dict):
             return
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            if isinstance(data, dict):
-                self.skills = data
-                self.refresh_categories()
-                self.skills_listbox.delete(0, tk.END)
-                self.aliases_listbox.delete(0, tk.END)
-                self.current_file = path
-            else:
-                messagebox.showerror("Error", "Invalid JSON format.")
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-
-    def save_json(self):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        project_dir = os.path.dirname(script_dir)
-        data_dir = os.path.join(project_dir, "data")
-        os.makedirs(data_dir, exist_ok=True)
-        path = filedialog.asksaveasfilename(initialdir=data_dir, defaultextension=".json", filetypes=[("JSON Files", "*.json")])
-        if not path:
-            return
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(self.skills, f, indent=2)
-            self.current_file = path
-            messagebox.showinfo("Saved", f"Skills saved to {path}")
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
+        normalized = {}
+        for cat, skills in data.items():
+            normalized[cat] = []
+            if isinstance(skills, list):
+                for skill in skills:
+                    if isinstance(skill, dict) and "name" in skill:
+                        normalized[cat].append(skill)
+                    elif isinstance(skill, str):
+                        normalized[cat].append({"name": skill, "aliases": []})
+            elif isinstance(skills, dict):
+                for skill_name, aliases in skills.items():
+                    normalized[cat].append({"name": skill_name, "aliases": aliases if isinstance(aliases, list) else []})
+        self.skills = normalized
+        self.refresh_categories()
+        self.skills_listbox.delete(0, tk.END)
+        self.aliases_listbox.delete(0, tk.END)
+        self.last_selected_category = None
+        self.last_selected_skill_index = None
+        self.last_selected_skill = None
 
     def autosave(self):
         try:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            project_dir = os.path.dirname(script_dir)  # go up one level to project root
-            data_dir = os.path.join(project_dir, "data")  # correct data folder path
-            os.makedirs(data_dir, exist_ok=True)
-            path = os.path.join(data_dir, "skills_autosave.json")
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(self.skills, f, indent=2)
-            print(f"Autosaved to {path}")
-        except Exception as e:
-            print(f"Autosave failed: {e}")
+            if self.current_file:
+                folder = os.path.dirname(self.current_file)
+            else:
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                project_dir = os.path.dirname(os.path.dirname(script_dir))
+                folder = os.path.join(project_dir, "data")
+                os.makedirs(folder, exist_ok=True)
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = SkillManagerApp(root)
-    root.geometry("1000x600")
-    root.mainloop()
+            path = os.path.join(folder, "skills_autosave.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump({
+                    cat: [{"name": s["name"], "aliases": s.get("aliases", [])} for s in skills]
+                    for cat, skills in self.skills.items()
+                }, f, indent=2)
+            print(f"Skills autosaved to {path}")
+        except Exception as e:
+            print(f"Skills autosave failed: {e}")
