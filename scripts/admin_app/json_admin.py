@@ -6,6 +6,10 @@ from personal_info_tab import PersonalInfoTab
 from skills_tab import SkillsTab
 from certifications_tab import CertificationsTab
 from education_tab import EducationTab
+from experience_tab import ExperienceTab
+from projects_tab import ProjectsTab
+from summaries_tab import SummariesTab
+
 from utils import LargeEntryDialog
 
 class SkillManagerApp:
@@ -26,12 +30,19 @@ class SkillManagerApp:
         self.skills_tab = SkillsTab(self.notebook)
         self.certifications_tab = CertificationsTab(self.notebook)
         self.education_tab = EducationTab(self.notebook)
+        self.experience_tab = ExperienceTab(self.notebook)
+        self.projects_tab = ProjectsTab(self.notebook)
+        self.summaries_tab = SummariesTab(self.notebook)
+
 
         self.files_to_load = [
-            ("personal_info.json", self.personal_info_tab, "current_file"),
-            ("skills.json", self.skills_tab, "current_file"),
-            ("certifications.json", self.certifications_tab, "current_file"),
-            ("education.json", self.education_tab, "current_file"),
+            ("personal_info.json", self.personal_info_tab, "current_file", {}),
+            ("skills.json", self.skills_tab, "current_file", {}),
+            ("certifications.json", self.certifications_tab, "current_file", []),
+            ("education.json", self.education_tab, "current_file", []),
+            ("experience.json", self.experience_tab, "current_file", []),
+            ("projects.json", self.projects_tab, "current_file", {}),
+            ("summaries.json", self.summaries_tab, "current_file", {}),
         ]
 
         # Bottom buttons for saving/loading all tabs
@@ -61,12 +72,12 @@ class SkillManagerApp:
         if not folder:
             return
 
-        for filename, tab, attr in self.files_to_load:
+        for filename, tab, attr, _ in self.files_to_load:
             path = os.path.join(folder, filename)
             self.load_json_file(path, tab, attr, filename)
 
     def save_all(self):
-        for filename, tab, file_attr in self.files_to_load:
+        for filename, tab, file_attr, _ in self.files_to_load:
             if getattr(tab, file_attr):
                 tab.save()
             else:
@@ -74,71 +85,70 @@ class SkillManagerApp:
         messagebox.showinfo("Save Complete", "All data saved successfully.")
 
     def create_new_user(self):
-        # Ask for the new user name
         dlg = LargeEntryDialog(self.root, title="New User", prompt="Enter new user name:")
         user_name = dlg.result
         if not user_name:
-            return  # User cancelled or empty input
+            return
 
-        # Sanitize the folder name a bit (strip spaces)
         user_name = user_name.strip()
         if not user_name:
             messagebox.showerror("Error", "User name cannot be empty.")
             return
 
-        # Determine the base data directory
         script_dir = os.path.dirname(os.path.abspath(__file__))
         project_dir = os.path.dirname(os.path.dirname(script_dir))
         data_dir = os.path.join(project_dir, "data")
 
-        # New user folder path
         user_folder = os.path.join(data_dir, user_name)
         if os.path.exists(user_folder):
             messagebox.showerror("Error", f"User folder '{user_name}' already exists.")
             return
 
         try:
-            # Create new user folder
             os.makedirs(user_folder, exist_ok=False)
 
-            # Create empty personal_info.json with default empty structure
-            personal_info_path = os.path.join(user_folder, "personal_info.json")
-            with open(personal_info_path, "w", encoding="utf-8") as f:
-                json.dump({}, f, indent=2)
+            for filename, tab_obj, file_attr, default_data in self.files_to_load:
+                path = os.path.join(user_folder, filename)
+                # Special handling for summaries.json
+                if filename == "summaries.json":
+                    summaries_folder = os.path.join(user_folder, "summaries")
+                    os.makedirs(summaries_folder, exist_ok=True)
+                    
+                    default_txt_path = os.path.join(summaries_folder, "default.txt")
+                    if not os.path.exists(default_txt_path):
+                        with open(default_txt_path, "w", encoding="utf-8") as f:
+                            f.write("Default summary content here.")  # or ""
 
-            # Create empty skills.json with default empty structure
-            skills_path = os.path.join(user_folder, "skills.json")
-            with open(skills_path, "w", encoding="utf-8") as f:
-                json.dump({}, f, indent=2)
+                    # Prepare default summaries data with paths inside summaries folder
+                    summaries_with_paths = {}
+                    for key in default_data:
+                        file_name = key.lower().replace(" ", "_") + ".txt"
+                        summaries_with_paths[key] = os.path.join("summaries", file_name)
+                        
+                        # Create empty summary text file
+                        summary_txt_path = os.path.join(user_folder, summaries_with_paths[key])
+                        if not os.path.exists(summary_txt_path):
+                            with open(summary_txt_path, "w", encoding="utf-8") as f:
+                                f.write("")
 
-            # Create empty certifications.json
-            certifications_path = os.path.join(user_folder, "certifications.json")
-            with open(certifications_path, "w", encoding="utf-8") as f:
-                json.dump([], f, indent=2)
+                    summaries_with_paths["default"] = "summaries/default.txt"
 
-            # Create empty education.json
-            education_path = os.path.join(user_folder, "education.json")
-            with open(education_path, "w", encoding="utf-8") as f:
-                json.dump([], f, indent=2)  # assuming education data is a list
-
-            # Load these new empty files into the app
-            self.personal_info_tab.load_data({})
-            self.personal_info_tab.current_file = personal_info_path
-
-            self.skills_tab.load_data({})
-            self.skills_tab.current_file = skills_path
-
-            self.certifications_tab.load_data({})
-            self.certifications_tab.current_file = certifications_path
-
-            self.education_tab.load_data([])
-            self.education_tab.current_file = education_path
+                    with open(path, "w", encoding="utf-8") as f:
+                        json.dump(summaries_with_paths, f, indent=2)
+                    
+                    tab_obj.load_data(summaries_with_paths)
+                    setattr(tab_obj, file_attr, path)
+                    continue  # Skip to next file after summaries is handled
+                
+                with open(path, "w", encoding="utf-8") as f:
+                    json.dump(default_data, f, indent=2)
+                tab_obj.load_data(default_data)
+                setattr(tab_obj, file_attr, path)
 
             messagebox.showinfo("Success", f"New user '{user_name}' created and loaded.")
 
         except Exception as e:
             messagebox.showerror("Error", f"Failed to create new user folder:\n{e}")
-
 
 if __name__ == "__main__":
     root = tk.Tk()
