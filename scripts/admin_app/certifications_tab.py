@@ -3,6 +3,7 @@ from tkinter import messagebox, simpledialog
 import json
 import os
 from base_tab import BaseTab
+from utils import LargeEntryDialog
 
 class CertificationsTab(BaseTab):
     def __init__(self, notebook):
@@ -45,7 +46,8 @@ class CertificationsTab(BaseTab):
         tk.Button(right_frame, text="Save Changes", command=self.save_changes).grid(row=3, column=0, columnspan=2, pady=10)
 
     def add_certification(self):
-        new_name = simpledialog.askstring("Add Certification", "Enter certification name:")
+        dlg = LargeEntryDialog(self.frame, title="Add Certification", prompt="Enter certification name:")
+        new_name = dlg.result
         if not new_name:
             return
         new_name = new_name.strip()

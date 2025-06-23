@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import os
 from base_tab import BaseTab
+from utils import LargeEntryDialog
 
 class EducationTab(BaseTab):
     def __init__(self, notebook):
@@ -18,6 +19,7 @@ class EducationTab(BaseTab):
         tk.Label(left_frame, text="Degrees").pack()
         self.degree_listbox = tk.Listbox(left_frame, width=30)
         self.degree_listbox.pack(fill=tk.Y, expand=True)
+        self.degree_listbox.config(exportselection=False)
         self.degree_listbox.bind("<<ListboxSelect>>", self.on_degree_select)
 
         btn_frame = tk.Frame(left_frame)
@@ -52,14 +54,22 @@ class EducationTab(BaseTab):
 
         tk.Label(bottom_right_frame, text="Details").pack(anchor=tk.W)
 
-        self.details_text = tk.Text(bottom_right_frame, height=10, wrap=tk.WORD)
-        self.details_text.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        # Listbox to show list of details
+        self.details_listbox = tk.Listbox(bottom_right_frame, height=8)
+        self.details_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.details_listbox.bind("<<ListboxSelect>>", self.on_detail_select)
 
-        scrollbar = tk.Scrollbar(bottom_right_frame, command=self.details_text.yview)
+        # Scrollbar for the Listbox
+        scrollbar = tk.Scrollbar(bottom_right_frame, command=self.details_listbox.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.details_text.config(yscrollcommand=scrollbar.set)
+        self.details_listbox.config(yscrollcommand=scrollbar.set)
 
-        self.details_text.bind("<Button-1>", self.select_detail_line)
+        # Editable text area for selected detail
+        tk.Label(bottom_right_frame, text="Detail Content").pack(anchor=tk.W, pady=(10, 0))
+
+        self.detail_editor = tk.Text(bottom_right_frame, height=4, wrap=tk.WORD)
+        self.detail_editor.pack(fill=tk.X, expand=False)
+        self.detail_editor.bind("<FocusOut>", self.on_detail_edit)
 
         # Buttons for details
         details_btn_frame = tk.Frame(bottom_right_frame)
@@ -72,7 +82,8 @@ class EducationTab(BaseTab):
     # --- Degree List Handlers ---
 
     def add_degree(self):
-        new_degree_name = simpledialog.askstring("Add Degree", "Enter new degree name:")
+        dlg = LargeEntryDialog(self.frame, title="Add Degree", prompt="Enter new degree name:")
+        new_degree_name = dlg.result
         if new_degree_name:
             self.degrees.append({
                 "degree": new_degree_name,
@@ -105,7 +116,8 @@ class EducationTab(BaseTab):
             messagebox.showwarning("Rename Degree", "No degree selected.")
             return
         current_name = self.degrees[index]["degree"]
-        new_name = simpledialog.askstring("Rename Degree", "Enter new degree name:", initialvalue=current_name)
+        dlg = LargeEntryDialog(self.frame, title="Rename Degree", prompt="Enter new degree name:", initialvalue=current_name)
+        new_name = dlg.result
         if new_name:
             self.degrees[index]["degree"] = new_name
             self.refresh_degree_list()
@@ -115,7 +127,6 @@ class EducationTab(BaseTab):
     def on_degree_select(self, event=None):
         index = self.get_selected_degree_index()
         if index is None:
-            self.clear_fields()
             return
         self.current_degree_index = index
         degree = self.degrees[index]
@@ -127,7 +138,7 @@ class EducationTab(BaseTab):
             self.entries[field].insert(0, value)
 
         # Load details
-        self.refresh_details_text()
+        self.refresh_details_list()
 
     def get_selected_degree_index(self):
         selection = self.degree_listbox.curselection()
@@ -149,7 +160,8 @@ class EducationTab(BaseTab):
     def clear_fields(self):
         for entry in self.entries.values():
             entry.delete(0, tk.END)
-        self.details_text.delete("1.0", tk.END)
+        self.details_listbox.delete(0, tk.END)
+        self.detail_editor.delete("1.0", tk.END)
         self.current_degree_index = None
 
     def on_field_change(self, event):
@@ -160,50 +172,25 @@ class EducationTab(BaseTab):
             degree[field] = entry.get()
         self.autosave()
 
-    # --- Details Handlers ---
-    def select_detail_line(self, event):
-        # Get index of click position
-        index = self.details_text.index(f"@{event.x},{event.y}")
-        line_number = index.split('.')[0]
-
-        # Select whole line
-        line_start = f"{line_number}.0"
-        line_end = f"{line_number}.end"
-
-        self.details_text.tag_remove(tk.SEL, "1.0", tk.END)
-        self.details_text.tag_add(tk.SEL, line_start, line_end)
-
-        # Move cursor to start of line (optional, but helps UX)
-        self.details_text.mark_set(tk.INSERT, line_start)
-
-        # Prevent default cursor placement (optional)
-        return "break"
-
-
-    def get_selected_detail_index(self):
-        try:
-            # Get current cursor line (1-based)
-            index = self.details_text.index(tk.INSERT).split('.')[0]
-            return int(index) - 1
-        except Exception:
-            return None
-
-    def refresh_details_text(self):
-        self.details_text.delete("1.0", tk.END)
+    def refresh_details_list(self):
+        self.details_listbox.delete(0, tk.END)
         degree = self.get_selected_degree()
         if degree:
             for detail in degree.get("details", []):
-                self.details_text.insert(tk.END, detail + "\n")
+                self.details_listbox.insert(tk.END, detail)
 
     def add_detail(self):
         degree = self.get_selected_degree()
         if not degree:
             messagebox.showwarning("Add Detail", "No degree selected.")
             return
-        new_detail = simpledialog.askstring("Add Detail", "Enter new detail:")
+        dlg = LargeEntryDialog(self.frame, title="Add Detail", prompt="Enter new detail:", width=70, height=15)
+        new_detail = dlg.result
         if new_detail:
             degree.setdefault("details", []).append(new_detail)
-            self.refresh_details_text()
+            self.refresh_details_list()
+            self.details_listbox.select_set(tk.END)
+            self.on_detail_select()
             self.autosave()
 
     def delete_detail(self):
@@ -211,33 +198,70 @@ class EducationTab(BaseTab):
         if not degree:
             messagebox.showwarning("Delete Detail", "No degree selected.")
             return
-        idx = self.get_selected_detail_index()
-        if idx is None:
-            messagebox.showwarning("Delete Detail", "Place cursor on the detail line to delete.")
+        idxs = self.details_listbox.curselection()
+        if not idxs:
+            messagebox.showwarning("Delete Detail", "No detail selected.")
             return
+        idx = idxs[0]
         details = degree.get("details", [])
         if 0 <= idx < len(details):
-            details.pop(idx)
-            self.refresh_details_text()
-            self.autosave()
+            if messagebox.askyesno("Delete Detail", "Are you sure you want to delete this detail?"):
+                details.pop(idx)
+                self.refresh_details_list()
+                self.detail_editor.delete("1.0", tk.END)
+                self.autosave()
 
     def modify_detail(self):
         degree = self.get_selected_degree()
         if not degree:
             messagebox.showwarning("Modify Detail", "No degree selected.")
             return
-        idx = self.get_selected_detail_index()
-        if idx is None:
-            messagebox.showwarning("Modify Detail", "Place cursor on the detail line to modify.")
+        idxs = self.details_listbox.curselection()
+        if not idxs:
+            messagebox.showwarning("Modify Detail", "No detail selected.")
             return
+        idx = idxs[0]
         details = degree.get("details", [])
         if 0 <= idx < len(details):
             current_detail = details[idx]
-            new_detail = simpledialog.askstring("Modify Detail", "Edit detail:", initialvalue=current_detail)
+            dlg = LargeEntryDialog(self.frame, title="Modify Detail", prompt="Edit detail:", initialvalue=current_detail, width=70, height=15)
+            new_detail = dlg.result
             if new_detail is not None:
                 details[idx] = new_detail
-                self.refresh_details_text()
+                self.refresh_details_list()
+                self.details_listbox.select_set(idx)
+                self.on_detail_select()
                 self.autosave()
+
+    def on_detail_select(self, event=None):
+        degree = self.get_selected_degree()
+        if not degree:
+            return
+        idxs = self.details_listbox.curselection()
+        if not idxs:
+            self.detail_editor.delete("1.0", tk.END)
+            return
+        idx = idxs[0]
+        details = degree.get("details", [])
+        if 0 <= idx < len(details):
+            self.detail_editor.delete("1.0", tk.END)
+            self.detail_editor.insert(tk.END, details[idx])
+
+    def on_detail_edit(self, event=None):
+        degree = self.get_selected_degree()
+        if not degree:
+            return
+        idxs = self.details_listbox.curselection()
+        if not idxs:
+            return
+        idx = idxs[0]
+        details = degree.get("details", [])
+        if 0 <= idx < len(details):
+            new_text = self.detail_editor.get("1.0", tk.END).strip()
+            details[idx] = new_text
+            self.refresh_details_list()
+            self.details_listbox.select_set(idx)
+            self.autosave()
 
     def get_data(self):
         return self.degrees

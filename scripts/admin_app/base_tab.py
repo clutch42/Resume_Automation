@@ -1,6 +1,6 @@
 import tkinter as tk
 import os
-from json_utils import save_json_file, load_json_file
+from utils import save_json_file, load_json_file
 
 class BaseTab:
     def __init__(self, notebook, tab_name, default_filename, autosave_suffix="_autosave.json"):

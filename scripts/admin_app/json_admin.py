@@ -6,6 +6,7 @@ from personal_info_tab import PersonalInfoTab
 from skills_tab import SkillsTab
 from certifications_tab import CertificationsTab
 from education_tab import EducationTab
+from utils import LargeEntryDialog
 
 class SkillManagerApp:
     def __init__(self, root):
@@ -64,48 +65,18 @@ class SkillManagerApp:
             path = os.path.join(folder, filename)
             self.load_json_file(path, tab, attr, filename)
 
-    def save_json_file(self, path, data, label):
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2)
-            print(f"{label} saved to {path}")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to save {label}:\n{e}")
-
     def save_all(self):
-        # Save personal info
-        if self.personal_info_tab.current_file:
-            self.save_json_file(self.personal_info_tab.current_file, self.personal_info_tab.data, "personal_info.json")
-        else:
-            print("No personal_info.json file loaded, skipping save.")
-
-        # Save skills
-        if self.skills_tab.current_file:
-            skills_data = {
-                cat: [{"name": s["name"], "aliases": s.get("aliases", [])} for s in skills]
-                for cat, skills in self.skills_tab.skills.items()
-            }
-            self.save_json_file(self.skills_tab.current_file, skills_data, "skills.json")
-        else:
-            print("No skills.json file loaded, skipping save.")
-
-        # Save certifications
-        if self.certifications_tab.current_file:
-            self.save_json_file(self.certifications_tab.current_file, self.certifications_tab.certifications, "certifications.json")
-        else:
-            print("No certifications.json file loaded, skipping save.")
-
-        # Save education
-        if self.education_tab.current_file:
-            self.save_json_file(self.education_tab.current_file, self.education_tab.get_data(), "education.json")
-        else:
-            print("No education.json file loaded, skipping save.")
-
+        for filename, tab, file_attr in self.files_to_load:
+            if getattr(tab, file_attr):
+                tab.save()
+            else:
+                print(f"No {filename} file loaded, skipping save.")
         messagebox.showinfo("Save Complete", "All data saved successfully.")
 
     def create_new_user(self):
         # Ask for the new user name
-        user_name = simpledialog.askstring("New User", "Enter new user name:")
+        dlg = LargeEntryDialog(self.root, title="New User", prompt="Enter new user name:")
+        user_name = dlg.result
         if not user_name:
             return  # User cancelled or empty input
 

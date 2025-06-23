@@ -3,6 +3,7 @@ from tkinter import messagebox, simpledialog, filedialog
 import json
 import os
 from base_tab import BaseTab
+from utils import LargeEntryDialog
 
 class SkillsTab(BaseTab):
     def __init__(self, notebook):
@@ -60,7 +61,8 @@ class SkillsTab(BaseTab):
 
     # === Category Methods ===
     def add_category(self):
-        new_cat = simpledialog.askstring("Add Category", "Enter new category name:")
+        dialog = LargeEntryDialog(self.frame, "Add Category", "Enter new category name:")
+        new_cat = dialog.result
         if new_cat:
             new_cat = new_cat.strip()
             if new_cat in self.skills:
@@ -93,7 +95,8 @@ class SkillsTab(BaseTab):
             messagebox.showinfo("Info", "Select a category to rename.")
             return
         old_cat = self.category_listbox.get(sel[0])
-        new_cat = simpledialog.askstring("Rename Category", f"Rename '{old_cat}' to:")
+        dialog = LargeEntryDialog(self.frame, "Rename Category", f"Rename '{old_cat}' to:")
+        new_cat = dialog.result
         if new_cat:
             new_cat = new_cat.strip()
             if new_cat == old_cat:
@@ -116,7 +119,8 @@ class SkillsTab(BaseTab):
             messagebox.showinfo("Info", "Select a category first.")
             return
         cat = self.category_listbox.get(sel[0])
-        new_skill = simpledialog.askstring("Add Skill", f"Enter new skill for '{cat}':")
+        dialog = LargeEntryDialog(self.frame, "Add Skill", f"Enter new skill for '{cat}':")
+        new_skill = dialog.result
         if new_skill:
             new_skill = new_skill.strip()
             if any(s["name"] == new_skill for s in self.skills[cat]):
@@ -145,7 +149,8 @@ class SkillsTab(BaseTab):
             return
         cat = self.last_selected_category
         old_skill = self.skills[cat][self.last_selected_skill_index]["name"]
-        new_skill = simpledialog.askstring("Rename Skill", f"Enter new name for skill '{old_skill}':")
+        dialog = LargeEntryDialog(self.frame, "Rename Skill", f"Enter new name for skill '{old_skill}':", initialvalue=old_skill)
+        new_skill = dialog.result
         if new_skill:
             new_skill = new_skill.strip()
             if new_skill == old_skill:
@@ -165,7 +170,8 @@ class SkillsTab(BaseTab):
             return
         cat = self.last_selected_category
         skill = self.skills[cat][self.last_selected_skill_index]
-        new_alias = simpledialog.askstring("Add Alias", f"Enter alias for '{skill['name']}':")
+        dialog = LargeEntryDialog(self.frame, title="Add Alias", label=f"Enter alias for '{skill['name']}':")
+        new_alias = dialog.result
         if new_alias:
             new_alias = new_alias.strip()
             if new_alias in skill["aliases"]:
@@ -200,7 +206,8 @@ class SkillsTab(BaseTab):
         cat = self.last_selected_category
         skill = self.skills[cat][self.last_selected_skill_index]
         old_alias = self.aliases_listbox.get(alias_sel[0])
-        new_alias = simpledialog.askstring("Rename Alias", f"Rename alias '{old_alias}':")
+        dialog = LargeEntryDialog(self.frame, title="Rename Alias", label=f"Rename alias '{old_alias}':", initialvalue=old_alias)
+        new_alias = dialog.result
         if new_alias:
             new_alias = new_alias.strip()
             if new_alias == old_alias:
