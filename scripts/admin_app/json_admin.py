@@ -26,13 +26,30 @@ class SkillManagerApp:
         self.certifications_tab = CertificationsTab(self.notebook)
         self.education_tab = EducationTab(self.notebook)
 
+        self.files_to_load = [
+            ("personal_info.json", self.personal_info_tab, "current_file"),
+            ("skills.json", self.skills_tab, "current_file"),
+            ("certifications.json", self.certifications_tab, "current_file"),
+            ("education.json", self.education_tab, "current_file"),
+        ]
+
         # Bottom buttons for saving/loading all tabs
         bottom_buttons = tk.Frame(main_frame)
         bottom_buttons.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
 
-        tk.Button(bottom_buttons, text="Load All", command=self.load_all).pack(side=tk.LEFT, padx=10)
-        tk.Button(bottom_buttons, text="Save All", command=self.save_all).pack(side=tk.LEFT)
+        tk.Button(bottom_buttons, text="Load User", command=self.load_all).pack(side=tk.LEFT, padx=10)
+        tk.Button(bottom_buttons, text="Save User", command=self.save_all).pack(side=tk.LEFT)
         tk.Button(bottom_buttons, text="New User", command=self.create_new_user).pack(side=tk.LEFT, padx=10)
+
+    def load_json_file(self, path, tab, attribute_name, label):
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    tab.load_data(data)
+                    setattr(tab, attribute_name, path)
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to load {label}:\n{e}")
 
     def load_all(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,100 +60,48 @@ class SkillManagerApp:
         if not folder:
             return
 
-        # Load personal info
-        pi_path = os.path.join(folder, "personal_info.json")
-        if os.path.exists(pi_path):
-            try:
-                with open(pi_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.personal_info_tab.load_data(data)
-                    self.personal_info_tab.current_file = pi_path
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to load personal_info.json:\n{e}")
+        for filename, tab, attr in self.files_to_load:
+            path = os.path.join(folder, filename)
+            self.load_json_file(path, tab, attr, filename)
 
-        # Load skills
-        skills_path = os.path.join(folder, "skills.json")
-        if os.path.exists(skills_path):
-            try:
-                with open(skills_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.skills_tab.load_data(data)
-                    self.skills_tab.current_file = skills_path
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to load skills.json:\n{e}")
-        
-        # Load certifications
-        cert_path = os.path.join(folder, "certifications.json")
-        if os.path.exists(cert_path):
-            try:
-                with open(cert_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.certifications_tab.load_data(data)
-                    self.certifications_tab.current_file = cert_path
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to load certifications.json:\n{e}")
-            
-        # Load education
-        edu_path = os.path.join(folder, "education.json")
-        if os.path.exists(edu_path):
-            try:
-                with open(edu_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.education_tab.load_data(data)
-                    self.education_tab.current_file = edu_path
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to load education.json:\n{e}")
+    def save_json_file(self, path, data, label):
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+            print(f"{label} saved to {path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save {label}:\n{e}")
 
     def save_all(self):
         # Save personal info
         if self.personal_info_tab.current_file:
-            try:
-                with open(self.personal_info_tab.current_file, "w", encoding="utf-8") as f:
-                    json.dump(self.personal_info_tab.info, f, indent=2)
-                print(f"Personal info saved to {self.personal_info_tab.current_file}")
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to save personal_info.json:\n{e}")
+            self.save_json_file(self.personal_info_tab.current_file, self.personal_info_tab.data, "personal_info.json")
         else:
             print("No personal_info.json file loaded, skipping save.")
 
         # Save skills
         if self.skills_tab.current_file:
-            try:
-                with open(self.skills_tab.current_file, "w", encoding="utf-8") as f:
-                    json.dump({
-                        cat: [{"name": s["name"], "aliases": s.get("aliases", [])} for s in skills]
-                        for cat, skills in self.skills_tab.skills.items()
-                    }, f, indent=2)
-                print(f"Skills saved to {self.skills_tab.current_file}")
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to save skills.json:\n{e}")
+            skills_data = {
+                cat: [{"name": s["name"], "aliases": s.get("aliases", [])} for s in skills]
+                for cat, skills in self.skills_tab.skills.items()
+            }
+            self.save_json_file(self.skills_tab.current_file, skills_data, "skills.json")
         else:
             print("No skills.json file loaded, skipping save.")
 
-        messagebox.showinfo("Save Complete", "All data saved successfully.")
-
         # Save certifications
         if self.certifications_tab.current_file:
-            try:
-                with open(self.certifications_tab.current_file, "w", encoding="utf-8") as f:
-                    json.dump(self.certifications_tab.certifications, f, indent=2)
-                print(f"Certifications saved to {self.certifications_tab.current_file}")
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to save certifications.json:\n{e}")
+            self.save_json_file(self.certifications_tab.current_file, self.certifications_tab.certifications, "certifications.json")
         else:
             print("No certifications.json file loaded, skipping save.")
 
         # Save education
-        if hasattr(self.education_tab, 'current_file') and self.education_tab.current_file:
-            try:
-                with open(self.education_tab.current_file, "w", encoding="utf-8") as f:
-                    json.dump(self.education_tab.get_data(), f, indent=2)
-                print(f"Education saved to {self.education_tab.current_file}")
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to save education.json:\n{e}")
+        if self.education_tab.current_file:
+            self.save_json_file(self.education_tab.current_file, self.education_tab.get_data(), "education.json")
         else:
             print("No education.json file loaded, skipping save.")
 
+        messagebox.showinfo("Save Complete", "All data saved successfully.")
 
     def create_new_user(self):
         # Ask for the new user name

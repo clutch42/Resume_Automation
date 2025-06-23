@@ -1,16 +1,13 @@
 import json
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
+import os
+from base_tab import BaseTab
 
-class EducationTab:
+class EducationTab(BaseTab):
     def __init__(self, notebook):
-        self.frame = tk.Frame(notebook)
-        notebook.add(self.frame, text="Education")
-
+        super().__init__(notebook, "Education", "education.json")
         self.degrees = []
-        self.current_degree_index = None
-        self.current_file = None
-
         self.build_ui()
 
     def build_ui(self):
@@ -19,7 +16,7 @@ class EducationTab:
         left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=10)
 
         tk.Label(left_frame, text="Degrees").pack()
-        self.degree_listbox = tk.Listbox(left_frame, width=30, exportselection=False)
+        self.degree_listbox = tk.Listbox(left_frame, width=30)
         self.degree_listbox.pack(fill=tk.Y, expand=True)
         self.degree_listbox.bind("<<ListboxSelect>>", self.on_degree_select)
 
@@ -242,9 +239,10 @@ class EducationTab:
                 self.refresh_details_text()
                 self.autosave()
 
+    def get_data(self):
+        return self.degrees
+
     def load_data(self, data):
-        if not isinstance(data, list):
-            return
         self.degrees = []
         for item in data:
             if isinstance(item, dict) and "degree" in item:
@@ -259,33 +257,3 @@ class EducationTab:
                 })
         self.refresh_degree_list()
         self.clear_fields()
-        self.current_degree_index = None
-
-    def save_to_file(self, filepath=None):
-        if filepath:
-            self.current_file = filepath
-        if not self.current_file:
-            return
-        try:
-            with open(self.current_file, "w", encoding="utf-8") as f:
-                json.dump(self.degrees, f, indent=2)
-            print(f"Education data saved to {self.current_file}")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to save education data:\n{e}")
-
-    def autosave(self):
-        try:
-            if self.current_file:
-                folder = os.path.dirname(self.current_file)
-            else:
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                project_dir = os.path.dirname(os.path.dirname(script_dir))
-                folder = os.path.join(project_dir, "data")
-                os.makedirs(folder, exist_ok=True)
-
-            path = os.path.join(folder, "education_autosave.json")
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(self.degrees, f, indent=2)
-            print(f"Education autosaved to {path}")
-        except Exception as e:
-            print(f"Education autosave failed: {e}")

@@ -1,16 +1,10 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog, filedialog
-import json
-import os
+from base_tab import BaseTab  # Assuming BaseTab is in base_tab.py
 
-class PersonalInfoTab:
+class PersonalInfoTab(BaseTab):
     def __init__(self, notebook):
-        self.frame = tk.Frame(notebook)
-        notebook.add(self.frame, text="Personal Info")
-
-        self.info = {}
-        self.current_file = None
-
+        super().__init__(notebook, "Personal Info", "personal_info.json")
+        
         self.fields = {
             "name": "Name",
             "phone": "Phone",
@@ -35,34 +29,20 @@ class PersonalInfoTab:
         for entry in self.entries.values():
             entry.bind("<FocusOut>", self.on_entry_change)
 
-    def on_entry_change(self, event=None):
-        # Update self.info with current entries, and autosave
-        for key in self.fields:
-            self.info[key] = self.entries[key].get().strip()
-        self.autosave()
-
-    def autosave(self):
-        try:
-            if self.current_file:
-                folder = os.path.dirname(self.current_file)
-            else:
-                # fallback to default data folder if no file loaded yet
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                project_dir = os.path.dirname(os.path.dirname(script_dir))
-                folder = os.path.join(project_dir, "data")
-                os.makedirs(folder, exist_ok=True)
-
-            path = os.path.join(folder, "personal_info_autosave.json")
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(self.info, f, indent=2)
-            print(f"Personal info autosaved to {path}")
-        except Exception as e:
-            print(f"Autosave failed: {e}")
-
     def load_data(self, data):
         if not isinstance(data, dict):
             return
-        self.info = data
+        self.data = data
         for key, entry in self.entries.items():
             entry.delete(0, tk.END)
             entry.insert(0, data.get(key, ""))
+
+    def get_data(self):
+        result = {}
+        for key in self.fields:
+            result[key] = self.entries[key].get().strip()
+        self.data = result
+        return result
+
+    def on_entry_change(self, event=None):
+        self.autosave()

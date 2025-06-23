@@ -2,18 +2,15 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog, filedialog
 import json
 import os
+from base_tab import BaseTab
 
-class SkillsTab:
+class SkillsTab(BaseTab):
     def __init__(self, notebook):
-        self.frame = tk.Frame(notebook)
-        notebook.add(self.frame, text="Skills")
-
+        super().__init__(notebook, "Skills", "skills.json")
         self.skills = {}
-        self.current_file = None
         self.last_selected_category = None
         self.last_selected_skill_index = None
         self.last_selected_skill = None
-
         self.build_ui()
 
     def build_ui(self):
@@ -281,22 +278,6 @@ class SkillsTab:
         self.last_selected_skill_index = None
         self.last_selected_skill = None
 
-    def autosave(self):
-        try:
-            if self.current_file:
-                folder = os.path.dirname(self.current_file)
-            else:
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                project_dir = os.path.dirname(os.path.dirname(script_dir))
-                folder = os.path.join(project_dir, "data")
-                os.makedirs(folder, exist_ok=True)
+    def get_data(self):
+        return self.skills
 
-            path = os.path.join(folder, "skills_autosave.json")
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump({
-                    cat: [{"name": s["name"], "aliases": s.get("aliases", [])} for s in skills]
-                    for cat, skills in self.skills.items()
-                }, f, indent=2)
-            print(f"Skills autosaved to {path}")
-        except Exception as e:
-            print(f"Skills autosave failed: {e}")

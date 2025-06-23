@@ -2,16 +2,13 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog
 import json
 import os
+from base_tab import BaseTab
 
-class CertificationsTab:
+class CertificationsTab(BaseTab):
     def __init__(self, notebook):
-        self.frame = tk.Frame(notebook)
-        notebook.add(self.frame, text="Certifications")
-
+        super().__init__(notebook, "Certifications", "certifications.json")
         self.certifications = []
-        self.current_file = None
         self.last_selected_index = None
-
         self.build_ui()
 
     def build_ui(self):
@@ -132,10 +129,13 @@ class CertificationsTab:
         for cert in self.certifications:
             self.cert_listbox.insert(tk.END, cert["name"])
 
+    def get_data(self):
+        return self.certifications
+
     def load_data(self, data):
+        self.certifications = []
         if not isinstance(data, list):
             return
-        self.certifications = []
         for item in data:
             if isinstance(item, dict) and "name" in item:
                 self.certifications.append({
@@ -146,32 +146,3 @@ class CertificationsTab:
         self.refresh_list()
         self.clear_fields()
         self.last_selected_index = None
-
-    def save_to_file(self, filepath=None):
-        if filepath:
-            self.current_file = filepath
-        if not self.current_file:
-            return
-        try:
-            with open(self.current_file, "w", encoding="utf-8") as f:
-                json.dump(self.certifications, f, indent=2)
-            print(f"Certifications saved to {self.current_file}")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to save certifications:\n{e}")
-
-    def autosave(self):
-        try:
-            if self.current_file:
-                folder = os.path.dirname(self.current_file)
-            else:
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                project_dir = os.path.dirname(os.path.dirname(script_dir))
-                folder = os.path.join(project_dir, "data")
-                os.makedirs(folder, exist_ok=True)
-
-            path = os.path.join(folder, "certifications_autosave.json")
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(self.certifications, f, indent=2)
-            print(f"Certifications autosaved to {path}")
-        except Exception as e:
-            print(f"Certifications autosave failed: {e}")
