@@ -1,5 +1,14 @@
 {
-  "Software Developer": "summaries/software_developer.txt",
-  "IT Professional": "summaries/it_professional.txt",
-  "default": "summaries/default.txt"
+  "Software Developer": {
+    "summary": "summaries/software_developer.txt",
+    "cover_letter": "cover_letters/software_developer.txt"
+  },
+  "IT Professional": {
+    "summary": "summaries/it_professional.txt",
+    "cover_letter": "cover_letters/it_professional.txt"
+  },
+  "default": {
+    "summary": "summaries/default.txt",
+    "cover_letter": "cover_letters/default.txt"
+  }
 }

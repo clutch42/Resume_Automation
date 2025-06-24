@@ -1,3 +1,6 @@
 {
-  "default": "summaries/default.txt"
+  "default": {
+    "summary": "summaries/default.txt",
+    "cover_letter": "cover_letters/default.txt"
+  }
 }

@@ -75,7 +75,7 @@ def create_resume_heading(personal_info, professional_title=None):
     flowables.append(Paragraph(contact_info, contact_style))
     return flowables
 
-def create_resume_summary(professional_title):
+def create_resume_summary(user_folder_path, professional_title):
     styles = getSampleStyleSheet()
 
     # Bold "Summary" style
@@ -96,7 +96,7 @@ def create_resume_summary(professional_title):
         alignment=TA_LEFT,
         spaceAfter=BIG_SPACE
     )
-    summary_text = load_summary(professional_title)
+    summary_text = load_summary(user_folder_path, professional_title)
     flowables = []
     if summary_text:
         flowables.append(Paragraph("Summary", heading_style))
@@ -411,6 +411,32 @@ def create_resume_projects(projects):
         flowables.append(Spacer(1, LITTLE_SPACE))
 
     return flowables
+
+def generate_auto_resume(user_folder_path, job_data, output_pdf):
+    professional_title = job_data.get("professional_title")
+    matched_skills = job_data.get("matched_skills", {})
+    personal_info = load_personal_info(user_folder_path)
+    skills_dict = load_skills(user_folder_path)
+    experience_data = load_experience(user_folder_path)
+    education_data = load_education(user_folder_path)
+    certifications = load_certifications(user_folder_path)
+    projects = load_projects(user_folder_path)
+
+    story = []
+
+    # Add heading section flowables
+    story.extend(create_resume_heading(personal_info, professional_title))
+    story.extend(create_resume_summary(user_folder_path, professional_title))
+    story.extend(create_resume_skills(matched_skills, skills_dict))
+    story.extend(create_resume_experience(experience_data))
+    story.extend(create_resume_education(education_data))
+    story.extend(create_resume_certifications(certifications))
+    story.extend(create_resume_projects(projects))
+
+    doc = SimpleDocTemplate(output_pdf, pagesize=LETTER,
+                            rightMargin=MARGINS, leftMargin=MARGINS,
+                            topMargin=MARGINS, bottomMargin=MARGINS)
+    doc.build(story)
 
 def generate_resume(json_path, output_pdf):
     job_data = load_job_description(json_path)

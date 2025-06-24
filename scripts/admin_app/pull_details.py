@@ -1,24 +1,15 @@
 import spacy
 import re
 import json
+import os
 from collections import Counter, defaultdict
-from resume_creator import generate_resume
-from utils import load_skills
-
+from scripts.admin_app.resume_creator import generate_resume
+from utils import load_skills, load_professional_titles
+import tkinter as tk
+from tkinter import messagebox, simpledialog
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
-
-def load_professional_titles():
-    try:
-        with open("../data/summaries.json", "r", encoding="utf-8") as f:
-            summary_map = json.load(f)
-        # Exclude "default" from choices
-        titles = [title for title in summary_map.keys() if title.lower() != "default"]
-        return titles
-    except Exception as e:
-        print(f"Error loading professional titles: {e}")
-        return []
 
 # Helper to clean company names
 def clean_name(name):
@@ -144,6 +135,100 @@ def clean_word(word):
 
     # Strip from start and end
     return word.strip(to_strip)
+
+def confirm_experience_match(parent, company_name, experience_ranges):
+    summary = ""
+    if company_name:
+        summary += f"Detected company name: {company_name}\n"
+    else:
+        summary += "No company name detected.\n"
+
+    if experience_ranges:
+        summary += f"Detected experience ranges: {experience_ranges}\n"
+    else:
+        summary += "No experience ranges detected.\n"
+
+    summary += "Does the experience match your expectation?"
+
+    return messagebox.askyesno("Experience Confirmation", summary, parent=parent)
+
+
+def ask_professional_title(parent, titles):
+    prompt = "Choose your professional title from the list by number, or type your own:\n"
+    for idx, title in enumerate(titles, 1):
+        prompt += f"{idx}: {title}\n"
+    prompt += f"Enter choice (1-{len(titles)}) or type a title:"
+
+    answer = simpledialog.askstring("Professional Title", prompt, parent=parent)
+    if answer is None:
+        return None  # User cancelled
+
+    answer = answer.strip()
+    if answer.isdigit():
+        idx = int(answer)
+        if 1 <= idx <= len(titles):
+            return titles[idx - 1]
+        else:
+            messagebox.showerror("Invalid choice", "Invalid number choice. Using default None.")
+            return None
+    elif answer == "":
+        return None
+    else:
+        return answer
+
+def confirm_or_edit_company_name_popup(parent, detected_name):
+    while True:
+        prompt = f"Detected company name: {detected_name}\n\nPress OK to accept or enter a new company name:"
+        user_input = simpledialog.askstring("Confirm Company Name", prompt, parent=parent)
+
+        if user_input is None:  # User cancelled
+            return None
+
+        user_input = user_input.strip()
+
+        if not user_input:
+            # Accept original detected name
+            return detected_name
+
+        confirm = messagebox.askyesno("Confirm", f"Use '{user_input}'?", parent=parent)
+        if confirm:
+            return user_input
+        else:
+            # Loop again for new input
+            continue
+
+def process_description(text, user_folder_path):
+    root = tk.Tk()
+    root.withdraw()
+
+    company_name = get_most_common_company(text)
+    experience_ranges = extract_experience_ranges(text)
+
+    # Ask user if experience matches
+    match = confirm_experience_match(root, company_name, experience_ranges)
+    if not match:
+        root.destroy()
+        return False
+
+    # Prompt for professional title
+    titles = load_professional_titles(user_folder_path)
+    professional_title = ask_professional_title(root, titles)
+
+    company_name = confirm_or_edit_company_name_popup(root, company_name)
+    skills_dict = load_skills(user_folder_path)
+    matched_skills = extract_skills_from_text(text, skills_dict)
+
+    root.destroy()  # close hidden root window
+
+    output = {
+        "professional_title": professional_title,
+        "company_name": company_name,
+        "experience_ranges": experience_ranges if experience_ranges else None,
+        "matched_skills": matched_skills if matched_skills else None
+    }
+
+    # Continue with more processing or return data here
+    return output
 
 def main():
     with open("../description.txt", "r", encoding="utf-8") as f:

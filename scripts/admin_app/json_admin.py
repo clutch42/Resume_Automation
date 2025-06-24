@@ -1,7 +1,12 @@
+import sys
+import os
+
+# Add the parent folder of your script to sys.path so imports work
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import tkinter as tk
 from tkinter import messagebox, simpledialog, filedialog, ttk
 import json
-import os
 from personal_info_tab import PersonalInfoTab
 from skills_tab import SkillsTab
 from certifications_tab import CertificationsTab
@@ -9,12 +14,15 @@ from education_tab import EducationTab
 from experience_tab import ExperienceTab
 from projects_tab import ProjectsTab
 from summaries_tab import SummariesTab
+from pdf_generator import PDFGeneratorTab
 
 from utils import LargeEntryDialog
 
 class SkillManagerApp:
     def __init__(self, root):
         self.root = root
+        self.user_folder_path = None
+        root.app_instance = self
         self.root.title("Skill Categories Manager")
 
         # Outer frame to hold notebook and bottom buttons
@@ -33,7 +41,7 @@ class SkillManagerApp:
         self.experience_tab = ExperienceTab(self.notebook)
         self.projects_tab = ProjectsTab(self.notebook)
         self.summaries_tab = SummariesTab(self.notebook)
-
+        self.pdf_generator_tab = PDFGeneratorTab(self.notebook)
 
         self.files_to_load = [
             ("personal_info.json", self.personal_info_tab, "current_file", {}),
@@ -70,10 +78,15 @@ class SkillManagerApp:
 
         folder = filedialog.askdirectory(title="Select Folder with JSON Files", initialdir=data_dir)
         if not folder:
+            print("No folder selected")
             return
+        
+        self.user_folder_path = folder
+        print(f"[DEBUG] User folder set to: {self.user_folder_path}")
 
         for filename, tab, attr, _ in self.files_to_load:
             path = os.path.join(folder, filename)
+            print(f"[DEBUG] Loading file: {path}")
             self.load_json_file(path, tab, attr, filename)
 
     def save_all(self):
@@ -112,33 +125,56 @@ class SkillManagerApp:
                 # Special handling for summaries.json
                 if filename == "summaries.json":
                     summaries_folder = os.path.join(user_folder, "summaries")
+                    cover_letters_folder = os.path.join(user_folder, "cover_letters")
                     os.makedirs(summaries_folder, exist_ok=True)
-                    
-                    default_txt_path = os.path.join(summaries_folder, "default.txt")
-                    if not os.path.exists(default_txt_path):
-                        with open(default_txt_path, "w", encoding="utf-8") as f:
-                            f.write("Default summary content here.")  # or ""
+                    os.makedirs(cover_letters_folder, exist_ok=True)
 
-                    # Prepare default summaries data with paths inside summaries folder
+                    default_summary_path = os.path.join(summaries_folder, "default.txt")
+                    default_cover_path = os.path.join(cover_letters_folder, "default.txt")
+
+                    # Create default summary and cover letter files if they don't exist
+                    if not os.path.exists(default_summary_path):
+                        with open(default_summary_path, "w", encoding="utf-8") as f:
+                            f.write("Default summary content here.")
+
+                    if not os.path.exists(default_cover_path):
+                        with open(default_cover_path, "w", encoding="utf-8") as f:
+                            f.write("")
+
                     summaries_with_paths = {}
                     for key in default_data:
-                        file_name = key.lower().replace(" ", "_") + ".txt"
-                        summaries_with_paths[key] = os.path.join("summaries", file_name)
-                        
-                        # Create empty summary text file
-                        summary_txt_path = os.path.join(user_folder, summaries_with_paths[key])
-                        if not os.path.exists(summary_txt_path):
-                            with open(summary_txt_path, "w", encoding="utf-8") as f:
+                        file_base = key.lower().replace(" ", "_") + ".txt"
+                        summary_rel = os.path.join("summaries", file_base)
+                        cover_rel = os.path.join("cover_letters", file_base)
+
+                        # Create empty files if needed
+                        summary_abs = os.path.join(user_folder, summary_rel)
+                        cover_abs = os.path.join(user_folder, cover_rel)
+                        if not os.path.exists(summary_abs):
+                            with open(summary_abs, "w", encoding="utf-8") as f:
+                                f.write("")
+                        if not os.path.exists(cover_abs):
+                            with open(cover_abs, "w", encoding="utf-8") as f:
                                 f.write("")
 
-                    summaries_with_paths["default"] = "summaries/default.txt"
+                        summaries_with_paths[key] = {
+                            "summary": summary_rel,
+                            "cover_letter": cover_rel
+                        }
+
+                    # Always include default
+                    summaries_with_paths["default"] = {
+                        "summary": "summaries/default.txt",
+                        "cover_letter": "cover_letters/default.txt"
+                    }
 
                     with open(path, "w", encoding="utf-8") as f:
                         json.dump(summaries_with_paths, f, indent=2)
-                    
+
                     tab_obj.load_data(summaries_with_paths)
                     setattr(tab_obj, file_attr, path)
-                    continue  # Skip to next file after summaries is handled
+                    continue
+
                 
                 with open(path, "w", encoding="utf-8") as f:
                     json.dump(default_data, f, indent=2)

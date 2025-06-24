@@ -26,68 +26,121 @@ class SummariesTab(BaseTab):
         ttk.Button(top, text="Delete", command=self.delete_summary).pack(side="left", padx=5)
         ttk.Button(top, text="Save", command=self.save_summary).pack(side="left", padx=5)
 
-        self.text = tk.Text(self.frame, wrap="word")
-        self.text.pack(fill="both", expand=True, padx=10, pady=5)
+        # Summary Text Area
+        ttk.Label(self.frame, text="Summary Text:").pack(anchor="w", padx=10, pady=(10, 0))
+        self.text = tk.Text(self.frame, wrap="word", height=10)
+        self.text.pack(fill="both", expand=True, padx=10)
+
+        # Cover Letter Text Area
+        ttk.Label(self.frame, text="Cover Letter Text:").pack(anchor="w", padx=10, pady=(10, 0))
+        self.cover_letter_text = tk.Text(self.frame, wrap="word", height=12)
+        self.cover_letter_text.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
     def load_data(self, data):
         self.summaries = data
         self.dropdown["values"] = list(self.summaries.keys())
         self.current_key = None
-        self.current_file_path = None
+        self.current_file_path = {"summary": None, "cover_letter": None}
         self.summary_var.set("")
         self.text.delete("1.0", tk.END)
+        if hasattr(self, "cover_letter_text"):
+            self.cover_letter_text.delete("1.0", tk.END)
 
     def on_select(self, event=None):
         key = self.summary_var.get()
         if key and key in self.summaries:
-            path = os.path.join(os.path.dirname(self.current_file), self.summaries[key])
+            base_path = os.path.dirname(self.current_file)
+            paths = self.summaries[key]
+
+            # Load summary
+            summary_path = os.path.join(base_path, paths.get("summary", ""))
             self.current_key = key
-            self.current_file_path = path
+            self.current_file_path = summary_path
             try:
-                with open(path, "r", encoding="utf-8") as f:
+                with open(summary_path, "r", encoding="utf-8") as f:
                     self.text.delete("1.0", tk.END)
                     self.text.insert(tk.END, f.read())
             except Exception as e:
                 messagebox.showerror("Error", f"Could not read summary:\n{e}")
+                self.text.delete("1.0", tk.END)
+
+            # Load cover letter
+            cover_path = os.path.join(base_path, paths.get("cover_letter", ""))
+            try:
+                with open(cover_path, "r", encoding="utf-8") as f:
+                    self.cover_letter_text.delete("1.0", tk.END)
+                    self.cover_letter_text.insert(tk.END, f.read())
+            except Exception:
+                # It's valid to have no cover letter — just clear the field
+                self.cover_letter_text.delete("1.0", tk.END)
 
     def add_summary(self):
-        name = simpledialog.askstring("New Summary", "Enter summary label (e.g., 'Data Analyst'):")
+        name = simpledialog.askstring("New Entry", "Enter label (e.g., 'Data Analyst'):")
         if not name:
             return
+
         name = name.strip()
         if not name or name in self.summaries:
-            messagebox.showerror("Error", "Invalid or duplicate summary name.")
+            messagebox.showerror("Error", "Invalid or duplicate name.")
             return
 
-        filename = name.lower().replace(" ", "_") + ".txt"
-        rel_path = os.path.join("summaries", filename)
-        abs_path = os.path.join(os.path.dirname(self.current_file), rel_path)
+        base_dir = os.path.dirname(self.current_file)
+        file_base = name.lower().replace(" ", "_")
+        summaries_dir = os.path.join(base_dir, "summaries")
+
+        summary_rel_path = os.path.join("summaries", f"{file_base}.txt")
+        cover_rel_path = os.path.join("cover_letters", f"{file_base}_cover.txt")
+        summary_abs_path = os.path.join(base_dir, summary_rel_path)
+        cover_abs_path = os.path.join(base_dir, cover_rel_path)
 
         try:
-            os.makedirs(os.path.dirname(abs_path), exist_ok=True)
-            with open(abs_path, "w", encoding="utf-8") as f:
+            os.makedirs(summaries_dir, exist_ok=True)
+
+            with open(summary_abs_path, "w", encoding="utf-8") as f:
                 f.write("")
-            self.summaries[name] = rel_path.replace("\\", "/")
+
+            with open(cover_abs_path, "w", encoding="utf-8") as f:
+                f.write("")
+
+            self.summaries[name] = {
+                "summary": summary_rel_path.replace("\\", "/"),
+                "cover_letter": cover_rel_path.replace("\\", "/")
+            }
+
             self.dropdown["values"] = list(self.summaries.keys())
             self.summary_var.set(name)
             self.on_select()
-            self.autosave()
+            self.save()
         except Exception as e:
-            messagebox.showerror("Error", f"Could not create summary:\n{e}")
+            messagebox.showerror("Error", f"Could not create files:\n{e}")
 
     def delete_summary(self):
         key = self.summary_var.get()
         if not key:
             return
-        # Prevent deleting the default summary
         if key == "default":
             messagebox.showerror("Error", "The default summary cannot be deleted.")
             return
-        if messagebox.askyesno("Delete", f"Delete summary '{key}'?"):
+        if messagebox.askyesno("Delete", f"Delete entry '{key}'?"):
+            base_dir = os.path.dirname(self.current_file)
             try:
-                os.remove(os.path.join(os.path.dirname(self.current_file), self.summaries[key]))
-            except FileNotFoundError:
-                pass
+                paths = self.summaries.get(key, {})
+                if isinstance(paths, dict):
+                    summary_path = os.path.join(base_dir, paths.get("summary", ""))
+                    cover_path = os.path.join(base_dir, paths.get("cover_letter", ""))
+                    for path in [summary_path, cover_path]:
+                        try:
+                            if os.path.exists(path):
+                                os.remove(path)
+                        except Exception:
+                            pass
+                else:
+                    # fallback if old format (just string path)
+                    path = os.path.join(base_dir, paths)
+                    if os.path.exists(path):
+                        os.remove(path)
+            except Exception as e:
+                messagebox.showerror("Error", f"Error deleting files:\n{e}")
             del self.summaries[key]
             self.dropdown["values"] = list(self.summaries.keys())
             self.text.delete("1.0", tk.END)
@@ -97,15 +150,29 @@ class SummariesTab(BaseTab):
             self.save()
 
     def save_summary(self):
-        if not self.current_file_path:
+        if not self.current_key or self.current_key not in self.summaries:
             return
+
+        base_path = os.path.dirname(self.current_file)
+        paths = self.summaries[self.current_key]
+
+        summary_path = os.path.join(base_path, paths.get("summary", ""))
+        cover_path = os.path.join(base_path, paths.get("cover_letter", ""))
+
         try:
-            content = self.text.get("1.0", tk.END).strip()
-            with open(self.current_file_path, "w", encoding="utf-8") as f:
-                f.write(content)
-            messagebox.showinfo("Saved", f"Summary '{self.current_key}' saved.")
+            # Save summary
+            summary_content = self.text.get("1.0", tk.END).strip()
+            with open(summary_path, "w", encoding="utf-8") as f:
+                f.write(summary_content)
+
+            # Save cover letter
+            cover_content = self.cover_letter_text.get("1.0", tk.END).strip()
+            with open(cover_path, "w", encoding="utf-8") as f:
+                f.write(cover_content)
+
+            messagebox.showinfo("Saved", f"Summary and cover letter for '{self.current_key}' saved.")
         except Exception as e:
-            messagebox.showerror("Error", f"Could not save summary:\n{e}")
+            messagebox.showerror("Error", f"Could not save files:\n{e}")
 
     def get_data(self):
         return self.summaries
