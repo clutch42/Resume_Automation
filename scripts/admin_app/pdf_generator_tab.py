@@ -4,6 +4,7 @@ from base_tab import BaseTab  # Keep for layout consistency
 from scripts.admin_app.pull_details import process_description
 import os
 from resume_creator import generate_auto_resume
+from generate_cover_letters import generate_cover_letter_pdf
 
 class PDFGeneratorTab(BaseTab):
     def __init__(self, notebook):
@@ -39,9 +40,9 @@ class PDFGeneratorTab(BaseTab):
         input_text = self.text.get("1.0", tk.END).strip()
         output_path = self.output_var.get().strip()
 
-        if not input_text:
-            messagebox.showerror("Error", "Input text cannot be empty.")
-            return
+        #if not input_text:
+        #   messagebox.showerror("Error", "Input text cannot be empty.")
+        #   return
         if not output_path or not os.path.isdir(output_path):
             messagebox.showerror("Error", "Please specify a valid output directory.")
             return
@@ -70,3 +71,9 @@ class PDFGeneratorTab(BaseTab):
         full_output_path = os.path.join(output_path, filename)
         generate_auto_resume(user_folder_path, result, full_output_path)
 
+        # Generate cover letter PDF
+        professional_title = result.get("professional_title")  # make sure this matches your result structure
+        company_name = result.get("company_name") or "Hiring Manager"
+
+        full_output_file = os.path.join(output_path, "auto_cover_letter.pdf")
+        generate_cover_letter_pdf(user_folder_path, professional_title, company_name, full_output_file)

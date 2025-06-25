@@ -14,7 +14,7 @@ from education_tab import EducationTab
 from experience_tab import ExperienceTab
 from projects_tab import ProjectsTab
 from summaries_tab import SummariesTab
-from pdf_generator import PDFGeneratorTab
+from pdf_generator_tab import PDFGeneratorTab
 
 from utils import LargeEntryDialog
 

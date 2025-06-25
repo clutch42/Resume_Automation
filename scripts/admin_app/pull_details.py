@@ -201,6 +201,22 @@ def process_description(text, user_folder_path):
     root = tk.Tk()
     root.withdraw()
 
+    is_blank = not text or not text.strip()
+
+    if is_blank:
+        titles = load_professional_titles(user_folder_path)
+        professional_title = ask_professional_title(root, titles)
+        company_name = confirm_or_edit_company_name_popup(root, "")
+
+        root.destroy()
+
+        return {
+            "professional_title": professional_title,
+            "company_name": company_name,
+            "experience_ranges": None,
+            "matched_skills": None
+        }
+
     company_name = get_most_common_company(text)
     experience_ranges = extract_experience_ranges(text)
 

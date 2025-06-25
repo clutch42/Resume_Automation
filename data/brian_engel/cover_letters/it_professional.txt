@@ -1,0 +1,14 @@
+Dear Hiring Manager,
+
+I am excited to apply for opportunities at {company}. As a recent Computer Science graduate, I am eager to begin my career in the IT field. Although I have not held a formal IT role, my experience in customer-facing positions has helped me develop strong communication, problem-solving, and teamwork skills, which are essential for success in IT support and operational roles.
+
+During my time at Walmart and Lucky's Pub, I gained valuable experience managing priorities, working effectively under pressure, and assisting and training team members. These skills, combined with my technical knowledge in scripting, DevOps basics, cloud services, and troubleshooting, prepare me to contribute to your IT team.
+
+I hold CompTIA A+ and AWS Cloud Practitioner certifications, and I am committed to continuous learning and professional growth. I look forward to the opportunity to apply my skills and enthusiasm to support and advance the technology initiatives at {company}.
+
+Thank you for considering my application. I would welcome the chance to discuss how I can be a valuable asset to your team.
+
+Sincerely,  
+Brian Engel  
+(832) 888-6076  
+brian.engel4242@gmail.com

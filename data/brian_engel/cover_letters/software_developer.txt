@@ -1,0 +1,14 @@
+Dear Hiring Manager,
+
+I am excited to apply for opportunities at {company}. As a recent Computer Science graduate, I am eager to launch my career in software development. While I have not yet held a formal role in the field, my experience in the service industry has equipped me with strong communication, teamwork, and problem-solving skills that I believe are essential for success in any professional environment.
+
+Through roles at Walmart and Lucky’s Pub, I developed the ability to work effectively under pressure, manage multiple priorities, and lead and train team members. These experiences have strengthened my collaboration and adaptability, qualities I am confident will help me thrive in a software development role.
+
+Combined with my solid technical foundation in C++, Python, Java, and full-stack web development, I am passionate about continuous learning and committed to expanding my skills to contribute meaningfully to {company}. I am ready to learn quickly, collaborate with your team, and deliver quality results.
+
+Thank you for considering my application. I look forward to the possibility of discussing how my background and soft skills align with your needs.
+
+Sincerely,  
+Brian Engel  
+(832) 888-6076  
+brian.engel4242@gmail.com

@@ -136,3 +136,26 @@ def load_summary(user_folder_path, professional_title):
         print(f"Error loading summary: {e}")
 
     return None
+
+def load_cover_letter(user_folder_path, professional_title, company_name):
+    try:
+        path = os.path.join(user_folder_path, "summaries.json")
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        entry = data.get(professional_title) or data.get("default")
+        if not entry:
+            raise ValueError("No cover letter entry found for given title.")
+
+        rel_path = entry.get("cover_letter")
+        if not rel_path:
+            raise ValueError("Cover letter path missing in summaries.json.")
+
+        cover_path = os.path.join(user_folder_path, rel_path)
+        with open(cover_path, "r", encoding="utf-8") as cf:
+            template = cf.read()
+
+        return template.replace("{company_name}", company_name).strip()
+    except Exception as e:
+        print(f"Error loading cover letter: {e}")
+        return None

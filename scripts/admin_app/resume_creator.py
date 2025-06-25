@@ -414,7 +414,7 @@ def create_resume_projects(projects):
 
 def generate_auto_resume(user_folder_path, job_data, output_pdf):
     professional_title = job_data.get("professional_title")
-    matched_skills = job_data.get("matched_skills", {})
+    matched_skills = job_data.get("matched_skills") or {}
     personal_info = load_personal_info(user_folder_path)
     skills_dict = load_skills(user_folder_path)
     experience_data = load_experience(user_folder_path)
