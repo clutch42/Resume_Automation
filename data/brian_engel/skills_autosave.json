@@ -1,16 +1,40 @@
 {
+  "Database Technologies": [
+    {
+      "name": "MySQL",
+      "aliases": []
+    },
+    {
+      "name": "SQLite",
+      "aliases": []
+    },
+    {
+      "name": "MongoDB",
+      "aliases": []
+    },
+    {
+      "name": "PostgreSQL",
+      "aliases": [
+        "postgres"
+      ]
+    }
+  ],
   "Programming/Scripting": [
     {
-      "name": "Python",
-      "aliases": [
-        "python3",
-        "py"
-      ]
+      "name": "SQL",
+      "aliases": []
     },
     {
       "name": "C++",
       "aliases": [
         "cpp"
+      ]
+    },
+    {
+      "name": "Python",
+      "aliases": [
+        "python3",
+        "py"
       ]
     },
     {
@@ -34,10 +58,6 @@
       "aliases": [
         "ts"
       ]
-    },
-    {
-      "name": "SQL",
-      "aliases": []
     }
   ],
   "Web Development": [
@@ -85,26 +105,6 @@
       "name": "Spring Boot",
       "aliases": [
         "Springboot"
-      ]
-    }
-  ],
-  "Database Technologies": [
-    {
-      "name": "MongoDB",
-      "aliases": []
-    },
-    {
-      "name": "SQLite",
-      "aliases": []
-    },
-    {
-      "name": "MySQL",
-      "aliases": []
-    },
-    {
-      "name": "PostgreSQL",
-      "aliases": [
-        "postgres"
       ]
     }
   ]

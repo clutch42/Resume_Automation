@@ -9,6 +9,10 @@ class ProjectsTab(BaseTab):
         super().__init__(notebook, "Projects", "projects.json")
         self.projects_page_url = ""
         self.projects = []
+        self.project_drag_start_index = None
+        self.dragged_project_text = None
+        self.detail_drag_start_index = None
+        self.dragged_detail_text = None
         self.current_project_index = None
         self.build_ui()
 
@@ -34,6 +38,9 @@ class ProjectsTab(BaseTab):
         self.project_listbox.pack(fill=tk.Y, expand=True)
         self.project_listbox.config(exportselection=False)
         self.project_listbox.bind("<<ListboxSelect>>", self.on_project_select)
+        self.project_listbox.bind("<ButtonPress-1>", self.on_project_drag_start)
+        self.project_listbox.bind("<B1-Motion>", self.on_project_drag_motion)
+        self.project_listbox.bind("<ButtonRelease-1>", self.on_project_drag_drop)
 
         btn_frame = tk.Frame(left_frame)
         btn_frame.pack(pady=5)
@@ -69,6 +76,9 @@ class ProjectsTab(BaseTab):
         self.details_listbox = tk.Listbox(details_frame, height=8)
         self.details_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.details_listbox.bind("<<ListboxSelect>>", self.on_detail_select)
+        self.details_listbox.bind("<ButtonPress-1>", self.on_detail_drag_start)
+        self.details_listbox.bind("<B1-Motion>", self.on_detail_drag_motion)
+        self.details_listbox.bind("<ButtonRelease-1>", self.on_detail_drag_drop)
 
         scrollbar = tk.Scrollbar(details_frame, command=self.details_listbox.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -148,6 +158,7 @@ class ProjectsTab(BaseTab):
             self.url_field_entry.insert(0, project["url"])
 
         self.refresh_details_list()
+        self.detail_editor.delete("1.0", tk.END)
 
     def get_selected_project_index(self):
         selection = self.project_listbox.curselection()
@@ -275,6 +286,63 @@ class ProjectsTab(BaseTab):
             self.refresh_details_list()
             self.details_listbox.select_set(idx)
             self.autosave()
+
+    def on_project_drag_start(self, event):
+        self.project_drag_start_index = self.project_listbox.nearest(event.y)
+        self.dragged_project_text = self.project_listbox.get(self.project_drag_start_index)
+
+    def on_project_drag_motion(self, event):
+        if self.project_drag_start_index is None:
+            return
+        current_index = self.project_listbox.nearest(event.y)
+        if current_index != self.project_drag_start_index:
+            # Swap projects in the data list
+            self.projects[self.project_drag_start_index], self.projects[current_index] = (
+                self.projects[current_index], self.projects[self.project_drag_start_index]
+            )
+            self.refresh_project_list()
+            self.project_listbox.selection_clear(0, tk.END)
+            self.project_listbox.selection_set(current_index)
+            self.project_drag_start_index = current_index
+
+    def on_project_drag_drop(self, event):
+        if self.project_drag_start_index is None:
+            return
+        self.autosave()
+        self.project_drag_start_index = None
+        self.dragged_project_text = None
+
+    def on_detail_drag_start(self, event):
+        self.detail_drag_start_index = self.details_listbox.nearest(event.y)
+        self.dragged_detail_text = self.details_listbox.get(self.detail_drag_start_index)
+
+    def on_detail_drag_motion(self, event):
+        if self.detail_drag_start_index is None:
+            return
+        current_index = self.details_listbox.nearest(event.y)
+        if current_index != self.detail_drag_start_index:
+            project = self.get_selected_project()
+            if not project:
+                return
+            details = project.get("details", [])
+            if current_index < 0 or current_index >= len(details):
+                return
+            # Swap details in the current project's details list
+            details[self.detail_drag_start_index], details[current_index] = (
+                details[current_index], details[self.detail_drag_start_index]
+            )
+            self.refresh_details_list()
+            self.details_listbox.selection_clear(0, tk.END)
+            self.details_listbox.selection_set(current_index)
+            self.detail_drag_start_index = current_index
+
+    def on_detail_drag_drop(self, event):
+        if self.detail_drag_start_index is None:
+            return
+        self.autosave()
+        self.detail_drag_start_index = None
+        self.dragged_detail_text = None
+
 
     # --- Load/Save ---
 

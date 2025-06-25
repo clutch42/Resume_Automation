@@ -10,6 +10,8 @@ class CertificationsTab(BaseTab):
         super().__init__(notebook, "Certifications", "certifications.json")
         self.certifications = []
         self.last_selected_index = None
+        self.cert_drag_start_index = None
+        self.dragged_cert_text = None
         self.build_ui()
 
     def build_ui(self):
@@ -20,6 +22,9 @@ class CertificationsTab(BaseTab):
         self.cert_listbox = tk.Listbox(left_frame, width=40, exportselection=False)
         self.cert_listbox.pack(fill=tk.Y, expand=True)
         self.cert_listbox.bind("<<ListboxSelect>>", self.on_cert_select)
+        self.cert_listbox.bind("<Button-1>", self.on_cert_drag_start)
+        self.cert_listbox.bind("<B1-Motion>", self.on_cert_drag_motion)
+        self.cert_listbox.bind("<ButtonRelease-1>", self.on_cert_drag_drop)
 
         btn_frame = tk.Frame(left_frame)
         btn_frame.pack(pady=5)
@@ -130,6 +135,46 @@ class CertificationsTab(BaseTab):
         self.cert_listbox.delete(0, tk.END)
         for cert in self.certifications:
             self.cert_listbox.insert(tk.END, cert["name"])
+
+    def on_cert_drag_start(self, event):
+        self.drag_start_index = self.cert_listbox.nearest(event.y)
+        if self.drag_start_index >= 0:
+            self.dragged_item_text = self.cert_listbox.get(self.drag_start_index)
+
+    def on_cert_drag_motion(self, event):
+        if self.drag_start_index is None:
+            return
+
+        current_index = self.cert_listbox.nearest(event.y)
+        if current_index != self.drag_start_index:
+            certs = [self.cert_listbox.get(i) for i in range(self.cert_listbox.size())]
+            certs[self.drag_start_index], certs[current_index] = certs[current_index], certs[self.drag_start_index]
+
+            self.cert_listbox.delete(0, tk.END)
+            for cert in certs:
+                self.cert_listbox.insert(tk.END, cert)
+
+            self.drag_start_index = current_index
+            self.cert_listbox.selection_clear(0, tk.END)
+            self.cert_listbox.selection_set(current_index)
+
+    def on_cert_drag_drop(self, event):
+        if self.drag_start_index is None:
+            return
+
+        new_order = [self.cert_listbox.get(i) for i in range(self.cert_listbox.size())]
+
+        # Reorder self.certifications to match new_order by matching names
+        reordered = []
+        name_to_cert = {cert['name']: cert for cert in self.certifications}
+        for name in new_order:
+            if name in name_to_cert:
+                reordered.append(name_to_cert[name])
+        self.certifications = reordered
+
+        self.autosave()
+        self.drag_start_index = None
+        self.dragged_item_text = None
 
     def get_data(self):
         return self.certifications

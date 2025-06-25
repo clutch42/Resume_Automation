@@ -9,6 +9,11 @@ class EducationTab(BaseTab):
     def __init__(self, notebook):
         super().__init__(notebook, "Education", "education.json")
         self.degrees = []
+        self.degree_drag_start_index = None
+        self.dragged_degree_text = None
+        self.detail_drag_start_index = None
+        self.dragged_detail_text = None
+
         self.build_ui()
 
     def build_ui(self):
@@ -21,6 +26,9 @@ class EducationTab(BaseTab):
         self.degree_listbox.pack(fill=tk.Y, expand=True)
         self.degree_listbox.config(exportselection=False)
         self.degree_listbox.bind("<<ListboxSelect>>", self.on_degree_select)
+        self.degree_listbox.bind("<ButtonPress-1>", self.on_degree_drag_start)
+        self.degree_listbox.bind("<B1-Motion>", self.on_degree_drag_motion)
+        self.degree_listbox.bind("<ButtonRelease-1>", self.on_degree_drag_drop)
 
         btn_frame = tk.Frame(left_frame)
         btn_frame.pack(pady=5)
@@ -58,6 +66,9 @@ class EducationTab(BaseTab):
         self.details_listbox = tk.Listbox(bottom_right_frame, height=8)
         self.details_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.details_listbox.bind("<<ListboxSelect>>", self.on_detail_select)
+        self.details_listbox.bind("<ButtonPress-1>", self.on_detail_drag_start)
+        self.details_listbox.bind("<B1-Motion>", self.on_detail_drag_motion)
+        self.details_listbox.bind("<ButtonRelease-1>", self.on_detail_drag_drop)
 
         # Scrollbar for the Listbox
         scrollbar = tk.Scrollbar(bottom_right_frame, command=self.details_listbox.yview)
@@ -139,6 +150,7 @@ class EducationTab(BaseTab):
 
         # Load details
         self.refresh_details_list()
+        self.detail_editor.delete("1.0", tk.END)
 
     def get_selected_degree_index(self):
         selection = self.degree_listbox.curselection()
@@ -262,6 +274,58 @@ class EducationTab(BaseTab):
             self.refresh_details_list()
             self.details_listbox.select_set(idx)
             self.autosave()
+
+    def on_degree_drag_start(self, event):
+        self.degree_drag_start_index = self.degree_listbox.nearest(event.y)
+        self.dragged_degree_text = self.degree_listbox.get(self.degree_drag_start_index)
+
+    def on_degree_drag_motion(self, event):
+        if self.degree_drag_start_index is None:
+            return
+        current_index = self.degree_listbox.nearest(event.y)
+        if current_index != self.degree_drag_start_index:
+            # Swap degrees in the data list
+            self.degrees[self.degree_drag_start_index], self.degrees[current_index] = self.degrees[current_index], self.degrees[self.degree_drag_start_index]
+            self.refresh_degree_list()
+            self.degree_listbox.selection_clear(0, tk.END)
+            self.degree_listbox.selection_set(current_index)
+            self.degree_drag_start_index = current_index
+
+    def on_degree_drag_drop(self, event):
+        if self.degree_drag_start_index is None:
+            return
+        self.autosave()
+        self.degree_drag_start_index = None
+        self.dragged_degree_text = None
+
+    def on_detail_drag_start(self, event):
+        self.detail_drag_start_index = self.details_listbox.nearest(event.y)
+        self.dragged_detail_text = self.details_listbox.get(self.detail_drag_start_index)
+
+    def on_detail_drag_motion(self, event):
+        if self.detail_drag_start_index is None:
+            return
+        current_index = self.details_listbox.nearest(event.y)
+        if current_index != self.detail_drag_start_index:
+            degree = self.get_selected_degree()
+            if not degree:
+                return
+            details = degree.get("details", [])
+            if current_index < 0 or current_index >= len(details):
+                return
+            # Swap details in the current degree's details list
+            details[self.detail_drag_start_index], details[current_index] = details[current_index], details[self.detail_drag_start_index]
+            self.refresh_details_list()
+            self.details_listbox.selection_clear(0, tk.END)
+            self.details_listbox.selection_set(current_index)
+            self.detail_drag_start_index = current_index
+
+    def on_detail_drag_drop(self, event):
+        if self.detail_drag_start_index is None:
+            return
+        self.autosave()
+        self.detail_drag_start_index = None
+        self.dragged_detail_text = None
 
     def get_data(self):
         return self.degrees

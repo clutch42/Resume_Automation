@@ -12,6 +12,10 @@ class SkillsTab(BaseTab):
         self.last_selected_category = None
         self.last_selected_skill_index = None
         self.last_selected_skill = None
+        self.drag_start_index = None            # for categories
+        self.dragged_item_text = None           # for categories
+        self.skill_drag_start_index = None      # for skills
+        self.dragged_skill_text = None          # for skills
         self.build_ui()
 
     def build_ui(self):
@@ -23,6 +27,10 @@ class SkillsTab(BaseTab):
         self.category_listbox = tk.Listbox(left_frame, width=25, exportselection=False)
         self.category_listbox.pack(fill=tk.Y, expand=True)
         self.category_listbox.bind("<<ListboxSelect>>", self.on_category_select)
+        self.category_listbox.bind("<ButtonPress-1>", self.on_category_drag_start)
+        self.category_listbox.bind("<B1-Motion>", self.on_category_drag_motion)
+        self.category_listbox.bind("<ButtonRelease-1>", self.on_category_drag_drop)
+
 
         cat_btn_frame = tk.Frame(left_frame)
         cat_btn_frame.pack(pady=5)
@@ -38,6 +46,10 @@ class SkillsTab(BaseTab):
         self.skills_listbox = tk.Listbox(mid_frame, width=30, exportselection=False)
         self.skills_listbox.pack(fill=tk.Y, expand=True)
         self.skills_listbox.bind("<<ListboxSelect>>", self.on_skill_select)
+        self.skills_listbox.bind("<ButtonPress-1>", self.on_skill_drag_start)
+        self.skills_listbox.bind("<B1-Motion>", self.on_skill_drag_motion)
+        self.skills_listbox.bind("<ButtonRelease-1>", self.on_skill_drag_drop)
+
 
         skill_btn_frame = tk.Frame(mid_frame)
         skill_btn_frame.pack(pady=5)
@@ -261,6 +273,98 @@ class SkillsTab(BaseTab):
         self.last_selected_skill_index = idx
         self.last_selected_skill = self.skills[cat][idx]["name"]
         self.refresh_aliases(cat, idx)
+
+    def on_category_drag_start(self, event):
+        self.drag_start_index = self.category_listbox.nearest(event.y)
+        self.dragged_item_text = self.category_listbox.get(self.drag_start_index)
+    
+    def on_skill_drag_start(self, event):
+        self.skill_drag_start_index = self.skills_listbox.nearest(event.y)
+        self.dragged_item_text = self.skills_listbox.get(self.drag_start_index)
+
+    def on_category_drag_motion(self, event):
+        if self.drag_start_index is None:
+            return
+
+        current_index = self.category_listbox.nearest(event.y)
+        if current_index != self.drag_start_index:
+            # Get the full list of categories as-is from the listbox
+            cats = [self.category_listbox.get(i) for i in range(self.category_listbox.size())]
+
+            # Swap the two entries
+            cats[self.drag_start_index], cats[current_index] = cats[current_index], cats[self.drag_start_index]
+
+            # Redraw listbox
+            self.category_listbox.delete(0, tk.END)
+            for cat in cats:
+                self.category_listbox.insert(tk.END, cat)
+
+            # Update index
+            self.drag_start_index = current_index
+            self.category_listbox.selection_clear(0, tk.END)
+            self.category_listbox.selection_set(current_index)
+
+    def on_skill_drag_motion(self, event):
+        if self.skill_drag_start_index is None:
+            return
+
+        current_index = self.skills_listbox.nearest(event.y)
+        if current_index != self.skill_drag_start_index:
+            # Swap visual items only in the listbox
+            skills = [self.skills_listbox.get(i) for i in range(self.skills_listbox.size())]
+            skills[self.skill_drag_start_index], skills[current_index] = skills[current_index], skills[self.skill_drag_start_index]
+
+            self.skills_listbox.delete(0, tk.END)
+            for skill in skills:
+                self.skills_listbox.insert(tk.END, skill)
+
+            # Update index and selection to follow the drag
+            self.skill_drag_start_index = current_index
+            self.skills_listbox.selection_clear(0, tk.END)
+            self.skills_listbox.selection_set(current_index)
+            self.skills_listbox.activate(current_index)
+
+    def on_category_drag_drop(self, event):
+        if self.drag_start_index is None:
+            return
+
+        # Build new skills dictionary based on reordered categories
+        new_order = [self.category_listbox.get(i) for i in range(self.category_listbox.size())]
+        self.skills = {cat: self.skills.get(cat, []) for cat in new_order}
+
+        self.autosave()
+        self.drag_start_index = None
+        self.dragged_item_text = None
+
+    def on_skill_drag_drop(self, event):
+        if self.skill_drag_start_index is None or self.last_selected_category is None:
+            return
+
+        new_order_names = [self.skills_listbox.get(i) for i in range(self.skills_listbox.size())]
+
+        cat = self.last_selected_category
+        current_skills = self.skills.get(cat, [])
+
+        # Rebuild the skills list dicts based on the new visual order
+        reordered_skills = []
+        for skill_name in new_order_names:
+            for skill_dict in current_skills:
+                if skill_dict["name"] == skill_name:
+                    reordered_skills.append(skill_dict)
+                    break
+
+        self.skills[cat] = reordered_skills
+
+        # Refresh the listbox based on updated data to ensure consistency
+        self.refresh_skills(cat)
+        # Re-select the dragged skill in its new position
+        self.skills_listbox.selection_clear(0, tk.END)
+        self.skills_listbox.selection_set(self.skill_drag_start_index)
+        self.skills_listbox.activate(self.skill_drag_start_index)
+
+        self.autosave()
+        self.skill_drag_start_index = None
+        self.dragged_skill_text = None
 
     def load_data(self, data):
         if not isinstance(data, dict):

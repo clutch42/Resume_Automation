@@ -8,6 +8,10 @@ class ExperienceTab(BaseTab):
     def __init__(self, notebook):
         super().__init__(notebook, "Experience", "experience.json")
         self.experiences = []
+        self.experience_drag_start_index = None
+        self.dragged_experience_text = None
+        self.detail_drag_start_index = None
+        self.dragged_detail_text = None
         self.build_ui()
 
     def build_ui(self):
@@ -20,6 +24,9 @@ class ExperienceTab(BaseTab):
         self.experience_listbox.pack(fill=tk.Y, expand=True)
         self.experience_listbox.config(exportselection=False)
         self.experience_listbox.bind("<<ListboxSelect>>", self.on_experience_select)
+        self.experience_listbox.bind("<ButtonPress-1>", self.on_experience_drag_start)
+        self.experience_listbox.bind("<B1-Motion>", self.on_experience_drag_motion)
+        self.experience_listbox.bind("<ButtonRelease-1>", self.on_experience_drag_drop)
 
         btn_frame = tk.Frame(left_frame)
         btn_frame.pack(pady=5)
@@ -56,6 +63,9 @@ class ExperienceTab(BaseTab):
         self.bullets_listbox = tk.Listbox(bottom_right_frame, height=8)
         self.bullets_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.bullets_listbox.bind("<<ListboxSelect>>", self.on_bullet_select)
+        self.bullets_listbox.bind("<ButtonPress-1>", self.on_bullet_drag_start)
+        self.bullets_listbox.bind("<B1-Motion>", self.on_bullet_drag_motion)
+        self.bullets_listbox.bind("<ButtonRelease-1>", self.on_bullet_drag_drop)
 
         scrollbar = tk.Scrollbar(bottom_right_frame, command=self.bullets_listbox.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -129,6 +139,7 @@ class ExperienceTab(BaseTab):
             self.entries[field].delete(0, tk.END)
             self.entries[field].insert(0, value)
         self.refresh_bullets_list()
+        self.bullet_editor.delete("1.0", tk.END)
 
     def get_selected_index(self):
         selection = self.experience_listbox.curselection()
@@ -244,6 +255,56 @@ class ExperienceTab(BaseTab):
             self.refresh_bullets_list()
             self.bullets_listbox.select_set(idx)
             self.autosave()
+
+    def on_experience_drag_start(self, event):
+        self.experience_drag_start_index = self.experience_listbox.nearest(event.y)
+        self.dragged_experience_text = self.experience_listbox.get(self.experience_drag_start_index)
+
+    def on_experience_drag_motion(self, event):
+        if self.experience_drag_start_index is None:
+            return
+        current_index = self.experience_listbox.nearest(event.y)
+        if current_index != self.experience_drag_start_index:
+            self.experiences[self.experience_drag_start_index], self.experiences[current_index] = self.experiences[current_index], self.experiences[self.experience_drag_start_index]
+            self.refresh_experience_list()
+            self.experience_listbox.selection_clear(0, tk.END)
+            self.experience_listbox.selection_set(current_index)
+            self.experience_drag_start_index = current_index
+
+    def on_experience_drag_drop(self, event):
+        if self.experience_drag_start_index is None:
+            return
+        self.autosave()
+        self.experience_drag_start_index = None
+        self.dragged_experience_text = None
+
+    def on_bullet_drag_start(self, event):
+        self.bullet_drag_start_index = self.bullets_listbox.nearest(event.y)
+        self.dragged_bullet_text = self.bullets_listbox.get(self.bullet_drag_start_index)
+
+    def on_bullet_drag_motion(self, event):
+        if self.bullet_drag_start_index is None:
+            return
+        current_index = self.bullets_listbox.nearest(event.y)
+        if current_index != self.bullet_drag_start_index:
+            exp = self.get_selected_experience()
+            if not exp:
+                return
+            bullets = exp.get("bullets", [])
+            if current_index < 0 or current_index >= len(bullets):
+                return
+            bullets[self.bullet_drag_start_index], bullets[current_index] = bullets[current_index], bullets[self.bullet_drag_start_index]
+            self.refresh_bullets_list()
+            self.bullets_listbox.selection_clear(0, tk.END)
+            self.bullets_listbox.selection_set(current_index)
+            self.bullet_drag_start_index = current_index
+
+    def on_bullet_drag_drop(self, event):
+        if self.bullet_drag_start_index is None:
+            return
+        self.autosave()
+        self.bullet_drag_start_index = None
+        self.dragged_bullet_text = None
 
     def get_data(self):
         return self.experiences
