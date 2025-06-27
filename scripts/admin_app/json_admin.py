@@ -31,10 +31,48 @@ class SkillManagerApp:
         main_frame.grid_rowconfigure(0, weight=1)    # Let the notebook expand vertically inside main_frame
         main_frame.grid_columnconfigure(0, weight=1) # Let the notebook expand horizontally inside main_frame
 
+        # Create a frame to hold the canvas and scrollbar
+        notebook_container = tk.Frame(main_frame)
+        notebook_container.grid(row=0, column=0, sticky="nsew")
+        notebook_container.grid_rowconfigure(0, weight=1)
+        notebook_container.grid_columnconfigure(0, weight=1)
+
+        # Create the canvas inside this container
+        canvas = tk.Canvas(notebook_container)
+        canvas.grid(row=0, column=0, sticky="nsew")
+
+        # Add a vertical scrollbar linked to the canvas
+        v_scrollbar = tk.Scrollbar(notebook_container, orient="vertical", command=canvas.yview)
+        v_scrollbar.grid(row=0, column=1, sticky="ns")
+        canvas.configure(yscrollcommand=v_scrollbar.set)
+
+        # Create a frame inside the canvas to hold the notebook
+        notebook_frame = tk.Frame(canvas)
+        notebook_window = canvas.create_window((0, 0), window=notebook_frame, anchor="nw")
+
+        # Update the scrollregion when the size of notebook_frame changes
+        def on_frame_configure(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        notebook_frame.bind("<Configure>", on_frame_configure)
+
+        # Make sure the canvas resizes the notebook_frame width accordingly
+        def on_canvas_configure(event):
+            canvas.itemconfig(notebook_window, width=event.width)
+
+        canvas.bind("<Configure>", on_canvas_configure)
+
+        # Enable mousewheel scrolling on the canvas
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)      # Windows and macOS
+        canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))  # Linux scroll up
+        canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))   # Linux scroll down
 
         # Notebook
-        self.notebook = ttk.Notebook(main_frame)
-        self.notebook.grid(row=0, column=0, sticky="nsew")
+        self.notebook = ttk.Notebook(notebook_frame)
+        self.notebook.pack(fill=tk.BOTH, expand=True)
 
         # Create Tabs
         self.personal_info_tab = PersonalInfoTab(self.notebook)
@@ -60,7 +98,6 @@ class SkillManagerApp:
         bottom_buttons = tk.Frame(main_frame)
         bottom_buttons.grid(row=1, column=0, sticky="ew", pady=10)  # Buttons stay at bottom, expand horizontally
         bottom_buttons.grid_columnconfigure(0, weight=1)
-
 
         tk.Button(bottom_buttons, text="Load User", command=self.load_all).pack(side=tk.LEFT, padx=10)
         tk.Button(bottom_buttons, text="Save User", command=self.save_all).pack(side=tk.LEFT)
@@ -198,5 +235,5 @@ class SkillManagerApp:
 if __name__ == "__main__":
     root = tk.Tk()
     app = SkillManagerApp(root)
-    root.geometry("1000x600")
+    root.geometry("980x520")
     root.mainloop()
