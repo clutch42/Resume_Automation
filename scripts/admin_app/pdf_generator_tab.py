@@ -67,7 +67,7 @@ class PDFGeneratorTab(BaseTab):
             return
         print(result)
 
-        filename = "auto_resume.pdf"
+        filename = "Brian_Engel_Resume.pdf"
         full_output_path = os.path.join(output_path, filename)
         generate_auto_resume(user_folder_path, result, full_output_path)
 
@@ -75,5 +75,5 @@ class PDFGeneratorTab(BaseTab):
         professional_title = result.get("professional_title")  # make sure this matches your result structure
         company_name = result.get("company_name") or "Hiring Manager"
 
-        full_output_file = os.path.join(output_path, "auto_cover_letter.pdf")
+        full_output_file = os.path.join(output_path, "Brian_Engel_Cover_Letter.pdf")
         generate_cover_letter_pdf(user_folder_path, professional_title, company_name, full_output_file)

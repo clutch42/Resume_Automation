@@ -182,7 +182,7 @@ class SkillsTab(BaseTab):
             return
         cat = self.last_selected_category
         skill = self.skills[cat][self.last_selected_skill_index]
-        dialog = LargeEntryDialog(self.frame, title="Add Alias", label=f"Enter alias for '{skill['name']}':")
+        dialog = LargeEntryDialog(self.frame, title="Add Alias", prompt=f"Enter alias for '{skill['name']}':")
         new_alias = dialog.result
         if new_alias:
             new_alias = new_alias.strip()
@@ -218,7 +218,7 @@ class SkillsTab(BaseTab):
         cat = self.last_selected_category
         skill = self.skills[cat][self.last_selected_skill_index]
         old_alias = self.aliases_listbox.get(alias_sel[0])
-        dialog = LargeEntryDialog(self.frame, title="Rename Alias", label=f"Rename alias '{old_alias}':", initialvalue=old_alias)
+        dialog = LargeEntryDialog(self.frame, title="Rename Alias", prompt=f"Rename alias '{old_alias}':", initialvalue=old_alias)
         new_alias = dialog.result
         if new_alias:
             new_alias = new_alias.strip()
@@ -235,7 +235,7 @@ class SkillsTab(BaseTab):
     # === Refresh + Event ===
     def refresh_categories(self):
         self.category_listbox.delete(0, tk.END)
-        for cat in sorted(self.skills.keys()):
+        for cat in self.skills.keys():
             self.category_listbox.insert(tk.END, cat)
 
     def refresh_skills(self, category):
@@ -280,7 +280,7 @@ class SkillsTab(BaseTab):
     
     def on_skill_drag_start(self, event):
         self.skill_drag_start_index = self.skills_listbox.nearest(event.y)
-        self.dragged_item_text = self.skills_listbox.get(self.drag_start_index)
+        self.dragged_item_text = self.skills_listbox.get(self.skill_drag_start_index)
 
     def on_category_drag_motion(self, event):
         if self.drag_start_index is None:

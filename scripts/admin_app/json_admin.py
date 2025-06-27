@@ -27,11 +27,14 @@ class SkillManagerApp:
 
         # Outer frame to hold notebook and bottom buttons
         main_frame = tk.Frame(root)
-        main_frame.pack(fill=tk.BOTH, expand=True)
+        main_frame.grid(row=0, column=0, sticky="nsew")
+        main_frame.grid_rowconfigure(0, weight=1)    # Let the notebook expand vertically inside main_frame
+        main_frame.grid_columnconfigure(0, weight=1) # Let the notebook expand horizontally inside main_frame
+
 
         # Notebook
         self.notebook = ttk.Notebook(main_frame)
-        self.notebook.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.notebook.grid(row=0, column=0, sticky="nsew")
 
         # Create Tabs
         self.personal_info_tab = PersonalInfoTab(self.notebook)
@@ -55,11 +58,17 @@ class SkillManagerApp:
 
         # Bottom buttons for saving/loading all tabs
         bottom_buttons = tk.Frame(main_frame)
-        bottom_buttons.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
+        bottom_buttons.grid(row=1, column=0, sticky="ew", pady=10)  # Buttons stay at bottom, expand horizontally
+        bottom_buttons.grid_columnconfigure(0, weight=1)
+
 
         tk.Button(bottom_buttons, text="Load User", command=self.load_all).pack(side=tk.LEFT, padx=10)
         tk.Button(bottom_buttons, text="Save User", command=self.save_all).pack(side=tk.LEFT)
         tk.Button(bottom_buttons, text="New User", command=self.create_new_user).pack(side=tk.LEFT, padx=10)
+
+        # Layout resizing setup for root window
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
 
     def load_json_file(self, path, tab, attribute_name, label):
         if os.path.exists(path):

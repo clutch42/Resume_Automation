@@ -30,7 +30,7 @@
     },
     {
       "name": "Computer Science Capstone, SNHU",
-      "url": "https://www.google.com/",
+      "url": null,
       "details": [
         "Improved projects by refactoring code, optimizing algorithms, and securing database queries.",
         "Upgraded BST to AVL tree and modularized OpenGL graphics code",

@@ -1,24 +1,4 @@
 {
-  "Database Technologies": [
-    {
-      "name": "MySQL",
-      "aliases": []
-    },
-    {
-      "name": "SQLite",
-      "aliases": []
-    },
-    {
-      "name": "MongoDB",
-      "aliases": []
-    },
-    {
-      "name": "PostgreSQL",
-      "aliases": [
-        "postgres"
-      ]
-    }
-  ],
   "Programming/Scripting": [
     {
       "name": "SQL",
@@ -58,13 +38,31 @@
       "aliases": [
         "ts"
       ]
+    },
+    {
+      "name": "Swift",
+      "aliases": []
+    },
+    {
+      "name": ".NET",
+      "aliases": [
+        "dotnet",
+        "net"
+      ]
     }
   ],
   "Web Development": [
     {
-      "name": "HTML5",
+      "name": "HTTP/HTTPS",
       "aliases": [
-        "html"
+        "http",
+        "https"
+      ]
+    },
+    {
+      "name": "HTML",
+      "aliases": [
+        "html5"
       ]
     },
     {
@@ -96,7 +94,7 @@
       ]
     },
     {
-      "name": "ASP.NET",
+      "name": "ASP\n.NET",
       "aliases": [
         "aspnet"
       ]
@@ -105,6 +103,153 @@
       "name": "Spring Boot",
       "aliases": [
         "Springboot"
+      ]
+    }
+  ],
+  "Database Technologies": [
+    {
+      "name": "MongoDB",
+      "aliases": []
+    },
+    {
+      "name": "SQLite",
+      "aliases": []
+    },
+    {
+      "name": "MySQL",
+      "aliases": []
+    },
+    {
+      "name": "PostgreSQL",
+      "aliases": [
+        "postgres"
+      ]
+    }
+  ],
+  "Software Engineering Practices": [
+    {
+      "name": "Secure Coding",
+      "aliases": []
+    },
+    {
+      "name": "Algorithm Development",
+      "aliases": []
+    },
+    {
+      "name": "Modular Design",
+      "aliases": []
+    },
+    {
+      "name": "Full Stack Development",
+      "aliases": []
+    },
+    {
+      "name": "Object Oriented Programming",
+      "aliases": [
+        "Object-Oriented Programming",
+        "OOP"
+      ]
+    },
+    {
+      "name": "Agile Software Development",
+      "aliases": [
+        "agile methodology",
+        "agile"
+      ]
+    },
+    {
+      "name": "SCRUM",
+      "aliases": []
+    },
+    {
+      "name": "RESTful APIs",
+      "aliases": [
+        "api",
+        "apis",
+        "RESTful",
+        "REST APIs"
+      ]
+    },
+    {
+      "name": "Testing and Validation",
+      "aliases": [
+        "testing",
+        "validation"
+      ]
+    },
+    {
+      "name": "Troubleshooting and Debugging",
+      "aliases": [
+        "troubleshooting",
+        "debugging",
+        "bug fixing"
+      ]
+    }
+  ],
+  "Development Tools": [
+    {
+      "name": "Git/GitHub",
+      "aliases": [
+        "git",
+        "github"
+      ]
+    },
+    {
+      "name": "VS Code",
+      "aliases": []
+    },
+    {
+      "name": "Visual Studio",
+      "aliases": []
+    },
+    {
+      "name": "Eclipse",
+      "aliases": []
+    },
+    {
+      "name": "Android Studio",
+      "aliases": []
+    },
+    {
+      "name": "PyCharm",
+      "aliases": []
+    }
+  ],
+  "Operating Systems & Tools": [
+    {
+      "name": "Windows",
+      "aliases": []
+    },
+    {
+      "name": "Linux",
+      "aliases": []
+    },
+    {
+      "name": "AWS",
+      "aliases": []
+    },
+    {
+      "name": "CI/CD Pipelines",
+      "aliases": []
+    },
+    {
+      "name": "Windows PowerShell",
+      "aliases": []
+    },
+    {
+      "name": "Bash",
+      "aliases": []
+    },
+    {
+      "name": "Office 365",
+      "aliases": [
+        "Microsoft Office"
+      ]
+    },
+    {
+      "name": "Active Directory",
+      "aliases": [
+        "AD"
       ]
     }
   ]
