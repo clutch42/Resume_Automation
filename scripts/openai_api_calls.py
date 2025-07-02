@@ -13,8 +13,10 @@ def _extract_all(job_description: str):
     global _cached_job_description, _cached_data
 
     if job_description == _cached_job_description:
+        print("✅ Using cached result")
         return _cached_data
 
+    print("📡 Calling OpenAI API")
     system_prompt = """You extract structured data from job descriptions.
 Return a raw JSON object (no markdown or backticks) with three keys:
 - 'company': name of the company, or 'Not found' if not mentioned
@@ -63,44 +65,6 @@ if __name__ == "__main__":
     print("Running test...")
 
     sample_description = """
-    Wiraa logo
-Wiraa
-Share
-Show more options
-Software Engineer (Java/Python)
-United States · 2 hours ago · Over 100 people clicked apply
-Promoted by hirer · Responses managed off LinkedIn
-
-
- Remote
-Matches your job preferences, workplace type is Remote.
-
- Full-time
-Matches your job preferences, job type is Full-time.
-
-Apply
-
-Save
-Save Software Engineer (Java/Python) at Wiraa
-Software Engineer (Java/Python)
-Wiraa · United States (Remote)
-
-Apply
-
-Save
-Save Software Engineer (Java/Python) at Wiraa
-Show more options
-How your profile and resume fit this job
-Get AI-powered advice on this job and more exclusive features with Premium. Try Premium for $0
-
-
-
-
-Tailor my resume to this job
-
-Am I a good fit for this job?
-
-How can I best position myself for this job?
 
 About the job
 About The Company
