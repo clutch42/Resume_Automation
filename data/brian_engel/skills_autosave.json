@@ -18,25 +18,29 @@
       ]
     },
     {
-      "name": "C#",
-      "aliases": [
-        "csharp"
-      ]
-    },
-    {
       "name": "Java",
       "aliases": []
     },
     {
       "name": "JavaScript",
       "aliases": [
-        "js"
+        "js",
+        "javascript/typescript",
+        "typescript/javascript"
+      ]
+    },
+    {
+      "name": "C#",
+      "aliases": [
+        "csharp"
       ]
     },
     {
       "name": "TypeScript",
       "aliases": [
-        "ts"
+        "ts",
+        "javascript/typescript",
+        "typescript/javas\ncript"
       ]
     },
     {
@@ -49,16 +53,19 @@
         "dotnet",
         "net"
       ]
+    },
+    {
+      "name": "Kotlin",
+      "aliases": []
+    },
+    {
+      "name": "Golang",
+      "aliases": [
+        "go"
+      ]
     }
   ],
   "Web Development": [
-    {
-      "name": "HTTP/HTTPS",
-      "aliases": [
-        "http",
-        "https"
-      ]
-    },
     {
       "name": "HTML",
       "aliases": [
@@ -104,6 +111,25 @@
       "aliases": [
         "Springboot"
       ]
+    },
+    {
+      "name": "HTTP/HTTPS",
+      "aliases": [
+        "http",
+        "https"
+      ]
+    },
+    {
+      "name": "TCP/IP",
+      "aliases": []
+    },
+    {
+      "name": "DNS",
+      "aliases": []
+    },
+    {
+      "name": "DHCP",
+      "aliases": []
     }
   ],
   "Database Technologies": [
@@ -167,7 +193,8 @@
         "api",
         "apis",
         "RESTful",
-        "REST APIs"
+        "REST APIs",
+        "REST"
       ]
     },
     {
@@ -212,6 +239,14 @@
     },
     {
       "name": "PyCharm",
+      "aliases": []
+    },
+    {
+      "name": "Postman",
+      "aliases": []
+    },
+    {
+      "name": "Swagger",
       "aliases": []
     }
   ],

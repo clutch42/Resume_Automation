@@ -99,15 +99,14 @@ def confirm_or_edit_company_name(detected_name):
 #        return json.load(f)
     
 def extract_skills_from_text(resume_text, skills_dict):
+    from collections import defaultdict
+
     found_skills = defaultdict(list)
     lowered_text = resume_text.lower()
-
-    # Tokenize and normalize text for simple matching
     tokens = [w.strip('()",.:;') for w in lowered_text.split()]
 
     for category, skill_items in skills_dict.items():
         for item in skill_items:
-            # Handle both old (string) and new (dict with aliases) formats
             if isinstance(item, str):
                 names_to_check = [item.lower()]
                 display_name = item
@@ -115,19 +114,23 @@ def extract_skills_from_text(resume_text, skills_dict):
                 names_to_check = [item["name"].lower()] + [alias.lower() for alias in item.get("aliases", [])]
                 display_name = item["name"]
 
+            matched = False
             for name in names_to_check:
-                # For multi-word skills like "Spring Boot"
                 if len(name.split()) > 1:
                     if name in lowered_text:
-                        found_skills[category].append(display_name)
+                        matched = True
                         break
                 else:
                     if name in tokens:
-                        found_skills[category].append(display_name)
+                        matched = True
                         break
 
-    return dict(found_skills)
+            if matched:
+                # Prevent duplicates (optional)
+                if display_name not in found_skills[category]:
+                    found_skills[category].append(display_name)
 
+    return dict(found_skills)
 
 def clean_word(word):
     # Characters to strip only at start or end
