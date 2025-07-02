@@ -1,12 +1,39 @@
+# Python bytecode and cache
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-*.spec
+
+# PyInstaller build artifacts
 build/
 dist/
+*.spec
+*.pkg
+*.toc
+*.pyz
+*.zip
+*.exe
+*.html
+*.txt
+
+# Logs and env files
 *.log
 *.env
-output.json
-my_resume.pdf
-test_resume.pdf
+
+# Output files and generated resumes
+output/
+*.json
+resumes/
+*.pdf
+
+# Data backups and personal info (autosave and sensitive files)
+data/*
+!data/.gitkeep
+
+# VS Code and system files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Temporary or misc files
+*.tmp

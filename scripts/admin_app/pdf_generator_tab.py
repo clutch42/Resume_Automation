@@ -49,7 +49,6 @@ class PDFGeneratorTab(BaseTab):
 
         try:
             self.run_pdf_script(input_text, output_path)
-            messagebox.showinfo("Success", "PDFs generated successfully.")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to generate PDFs:\n{e}")
 
@@ -77,3 +76,4 @@ class PDFGeneratorTab(BaseTab):
 
         full_output_file = os.path.join(output_path, "Brian_Engel_Cover_Letter.pdf")
         generate_cover_letter_pdf(user_folder_path, professional_title, company_name, full_output_file)
+        messagebox.showinfo("Success", "PDFs generated successfully.")
