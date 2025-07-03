@@ -21,13 +21,14 @@ def _extract_all(job_description: str):
 Return a raw JSON object (no markdown or backticks) with three keys:
 - 'company': name of the company, or 'Not found' if not mentioned
 - 'experience': minimum required experience as a string with unit of time, or 'Not found'
-- 'skills': a Python list of the skills mentioned
+- 'skills': a Python list of the skills mentioned, including technical skills such as programming languages, tools, frameworks, technologies, and software engineering and IT practices or methodologies.
+Do NOT include soft skills like communication, teamwork, leadership, or other interpersonal skills.
 
 Example format:
 {
     "company": "Acme Corp",
     "experience": "3 years",
-    "skills": ["Python", "Django", "REST APIs"]
+    "skills": ["Python", "Django", "REST APIs", "Testing and Validation", "Troubleshooting and Debugging"]
 }
 """
 
@@ -86,34 +87,6 @@ Experience with system testing, performance analysis, and troubleshooting
 Excellent communication skills to articulate technical concepts to diverse audiences
 Ability to work independently and as part of a team in a fast-paced environment
 Responsibilities
-
-Design, develop, test, and maintain software solutions using relevant programming languages
-Provide technical support and guidance to internal teams and external customers
-Participate in system analysis, design, documentation, and testing activities
-Collaborate with cross-disciplinary teams to define system requirements and design approaches
-Support system performance testing and optimize resource efficiency, stability, and scalability
-Maintain an in-depth understanding of Tangram Flex’s products, including Tangram Pro, and their application within customer environments
-Contribute to building and enhancing software products, customer systems, and demonstration environments
-Communicate technical concepts effectively to both technical and non-technical stakeholders
-Address and resolve customer issues promptly, ensuring alignment with company values and objectives
-Participate in Agile ceremonies such as sprint planning, reviews, and integration events
-Document technical processes and project progress clearly and accurately
-Benefits
-
-Remote, hybrid, or on-site work options at our Dayton, Ohio, location
-Flexible working hours and generous paid time off
-Employer-paid medical, dental, and vision insurance
-Short and long-term disability insurance coverage
-Access to group-rated plans for life, disability, and pet insurance
-Supportive work environment fostering transparency, collaboration, and well-being
-Engaging employee events for social interaction and knowledge sharing
-Opportunities for professional development and career growth
-Equal Opportunity
-Tangram Flex is an Affirmative Action and Equal Opportunity Employer. We are committed to creating an inclusive environment where all qualified candidates receive equal consideration for employment regardless of race, color, national origin, religion, age, disability status, genetics, protected veteran status, sex, sexual orientation, gender identity or expression, or any other characteristic protected by federal, state, or local laws.
-
-
-Desired Skills and Experience
-Information Technology
     """
 
     print("Company:", get_company(sample_description))

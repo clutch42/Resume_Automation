@@ -7,6 +7,7 @@ from scripts.admin_app.resume_creator import generate_resume
 from utils import load_skills, load_professional_titles
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+from scripts.openai_api_calls import get_company, get_experience
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -199,6 +200,56 @@ def confirm_or_edit_company_name_popup(parent, detected_name):
         else:
             # Loop again for new input
             continue
+
+def process_description_with_openai(text, user_folder_path):
+    root = tk.Tk()
+    root.withdraw()
+
+    is_blank = not text or not text.strip()
+
+    if is_blank:
+        titles = load_professional_titles(user_folder_path)
+        professional_title = ask_professional_title(root, titles)
+        company_name = confirm_or_edit_company_name_popup(root, "")
+
+        root.destroy()
+
+        return {
+            "professional_title": professional_title,
+            "company_name": company_name,
+            "experience_ranges": None,
+            "matched_skills": None
+        }
+
+    company_name = get_company(text)
+    experience_ranges = get_experience(text)
+
+
+    # Ask user if experience matches
+    match = confirm_experience_match(root, company_name, experience_ranges)
+    if not match:
+        root.destroy()
+        return False
+
+    # Prompt for professional title
+    titles = load_professional_titles(user_folder_path)
+    professional_title = ask_professional_title(root, titles)
+
+    company_name = confirm_or_edit_company_name_popup(root, company_name)
+    skills_dict = load_skills(user_folder_path)
+    matched_skills = extract_skills_from_text(text, skills_dict)
+
+    root.destroy()  # close hidden root window
+
+    output = {
+        "professional_title": professional_title,
+        "company_name": company_name,
+        "experience_ranges": experience_ranges if experience_ranges else None,
+        "matched_skills": matched_skills if matched_skills else None
+    }
+
+    # Continue with more processing or return data here
+    return output
 
 def process_description(text, user_folder_path):
     root = tk.Tk()
