@@ -19,7 +19,7 @@ def _extract_all(job_description: str):
     print("📡 Calling OpenAI API")
     system_prompt = """You extract structured data from job descriptions.
 Return a raw JSON object (no markdown or backticks) with three keys:
-- 'company': name of the company, or 'Not found' if not mentioned
+- 'company': the normalized name of the company (remove suffixes like Inc., LLC, Ltd., Corp., and any symbols such as ®, ™), or 'Not found' if not mentioned.
 - 'experience': minimum required experience as a string with unit of time, or 'Not found'
 - 'skills': a Python list of the skills mentioned, including technical skills such as programming languages, tools, frameworks, technologies, and software engineering and IT practices or methodologies.
 Do NOT include soft skills like communication, teamwork, leadership, or other interpersonal skills.
