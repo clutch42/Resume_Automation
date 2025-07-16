@@ -134,6 +134,8 @@ class SkillManagerApp:
             path = os.path.join(folder, filename)
             print(f"[DEBUG] Loading file: {path}")
             self.load_json_file(path, tab, attr, filename)
+            
+        self.pdf_generator_tab.load_personal_links()
 
     def save_all(self):
         for filename, tab, file_attr, _ in self.files_to_load:
