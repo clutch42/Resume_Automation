@@ -18,17 +18,22 @@ def _extract_all(job_description: str):
 
     print("📡 Calling OpenAI API")
     system_prompt = """You extract structured data from job descriptions.
-Return a raw JSON object (no markdown or backticks) with three keys:
+Return a raw JSON object (no markdown or backticks) with five keys:
 - 'company': the normalized name of the company (remove suffixes like Inc., LLC, Ltd., Corp., and any symbols such as ®, ™), or 'Not found' if not mentioned.
 - 'experience': minimum required experience as a string with unit of time, or 'Not found'
 - 'skills': a Python list of the skills mentioned, including technical skills such as programming languages, tools, frameworks, technologies, and software engineering and IT practices or methodologies.
 Do NOT include soft skills like communication, teamwork, leadership, or other interpersonal skills.
+- 'salary_range': the expected salary range mentioned in the description as a string (e.g., "$60,000 - $80,000", "€50k–€70k", "Not found" if not mentioned)
+- 'location': a concise sentence summarizing the work style (remote, hybrid, onsite) and any location or relocation requirements, or 'Not found' if not mentioned
+
 
 Example format:
 {
     "company": "Acme Corp",
     "experience": "3 years",
-    "skills": ["Python", "Django", "REST APIs", "Testing and Validation", "Troubleshooting and Debugging"]
+    "skills": ["Python", "Django", "REST APIs", "Testing and Validation", "Troubleshooting and Debugging"],
+    "salary_range": "$60,000 - $80,000",
+    "location": "Hybrid role requiring presence in New York City offices, remote work allowed 2 days per week, relocation assistance provided."
 }
 """
 
@@ -61,6 +66,12 @@ def get_experience(job_description):
 
 def get_skills(job_description):
     return _extract_all(job_description).get("skills", [])
+
+def get_salary_range(job_description):
+    return _extract_all(job_description).get("salary_range", "Not found")
+
+def get_location(job_description):
+    return _extract_all(job_description).get("location", "Not found")
 
 if __name__ == "__main__":
     print("Running test...")

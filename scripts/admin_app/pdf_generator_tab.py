@@ -7,7 +7,7 @@ import os
 from resume_creator import generate_auto_resume
 from generate_cover_letters import generate_cover_letter_pdf
 from utils import load_skills
-from scripts.openai_api_calls import get_skills
+from scripts.openai_api_calls import get_skills, get_company, get_experience, get_salary_range, get_location
 
 class PDFGeneratorTab(BaseTab):
     def __init__(self, notebook):
@@ -74,6 +74,10 @@ class PDFGeneratorTab(BaseTab):
         
         self.load_personal_links()
 
+        # Analysis info display area
+        self.analysis_info_frame = ttk.Frame(frame)
+        self.analysis_info_frame.pack(pady=10, padx=10, anchor="w")
+
     def browse_output_folder(self):
             folder = filedialog.askdirectory(title="Select Output Folder")
             if folder:
@@ -109,6 +113,7 @@ class PDFGeneratorTab(BaseTab):
 
             self.result_data = result
             self.description_processed = True
+            self.update_analysis_info()
             self.update_compare_button_state()
             self.update_pdf_button_state()
             messagebox.showinfo("Success", "Job description analyzed successfully.")
@@ -211,3 +216,21 @@ class PDFGeneratorTab(BaseTab):
             widget.config(foreground="orange")
             widget.after(500, lambda: widget.config(foreground=original_fg))
 
+    def update_analysis_info(self):
+        for widget in self.analysis_info_frame.winfo_children():
+            widget.destroy()
+
+        job_description = self.text.get("1.0", tk.END).strip()
+        if not job_description:
+            return
+
+        company_name = get_company(job_description)
+        experience = get_experience(job_description)
+        salary_range = get_salary_range(job_description)
+        location = get_location(job_description)
+
+        ttk.Label(self.analysis_info_frame, text=f"Company Name: {company_name}").pack(anchor="w", pady=2)
+        ttk.Label(self.analysis_info_frame, text=f"Experience Detected: {experience}").pack(anchor="w", pady=2)
+        ttk.Label(self.analysis_info_frame, text=f"Salary Range: {salary_range}").pack(anchor="w", pady=2)
+        ttk.Label(self.analysis_info_frame, text=f"Location Info: {location}").pack(anchor="w", pady=2)
+        
