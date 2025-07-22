@@ -224,7 +224,7 @@ class PDFGeneratorTab(BaseTab):
         if not job_description:
             return
 
-        company_name = get_company(job_description)
+        company_name = self.result_data.get("company_name") or get_company(job_description)
         experience = get_experience(job_description)
         salary_range = get_salary_range(job_description)
         location = get_location(job_description)
