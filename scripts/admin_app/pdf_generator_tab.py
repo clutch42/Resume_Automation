@@ -7,12 +7,12 @@ import os
 from resume_creator import generate_auto_resume
 from generate_cover_letters import generate_cover_letter_pdf
 from utils import load_skills
-from scripts.openai_api_calls import get_skills, get_company, get_experience, get_salary_range, get_location
+from scripts.openai_api_calls import get_skills, get_company, get_experience, get_salary_range, get_location, get_unusual_aspects, get_company_description
 
 class PDFGeneratorTab(BaseTab):
     def __init__(self, notebook):
         super().__init__(notebook, "PDF Generator", default_filename=None)
-        self.use_openai_var = tk.BooleanVar(value=False)
+        self.use_openai_var = tk.BooleanVar(value=True)
         self.result_data = None
         self.description_processed = False
         self.link_entries = {}
@@ -76,7 +76,8 @@ class PDFGeneratorTab(BaseTab):
 
         # Analysis info display area
         self.analysis_info_frame = ttk.Frame(frame)
-        self.analysis_info_frame.pack(pady=10, padx=10, anchor="w")
+        self.analysis_info_frame.pack(fill='x', pady=10, padx=10)
+        self.analysis_info_frame.bind("<Configure>", self.update_wraplengths)
 
     def browse_output_folder(self):
             folder = filedialog.askdirectory(title="Select Output Folder")
@@ -98,6 +99,7 @@ class PDFGeneratorTab(BaseTab):
             self.pdf_button.state(['disabled'])
 
     def analyze_description(self):
+        self.delete_old_pdfs()
         job_text = self.text.get("1.0", tk.END).strip()
         app = self.frame._root().app_instance
         user_folder_path = getattr(app, "user_folder_path", None)
@@ -228,9 +230,32 @@ class PDFGeneratorTab(BaseTab):
         experience = get_experience(job_description)
         salary_range = get_salary_range(job_description)
         location = get_location(job_description)
+        unusual = get_unusual_aspects(job_description)
+        company_description = get_company_description(job_description)
 
         ttk.Label(self.analysis_info_frame, text=f"Company Name: {company_name}").pack(anchor="w", pady=2)
         ttk.Label(self.analysis_info_frame, text=f"Experience Detected: {experience}").pack(anchor="w", pady=2)
         ttk.Label(self.analysis_info_frame, text=f"Salary Range: {salary_range}").pack(anchor="w", pady=2)
         ttk.Label(self.analysis_info_frame, text=f"Location Info: {location}").pack(anchor="w", pady=2)
-        
+        ttk.Label(self.analysis_info_frame, text=f"Unusual Aspects: {unusual}").pack(anchor="w", pady=2)
+        ttk.Label(self.analysis_info_frame, text=f"Company Description: {company_description}").pack(anchor="w", pady=2)
+        self.update_wraplengths()
+    
+    def delete_old_pdfs(self):
+        output_path = self.output_var.get().strip()
+        if os.path.isdir(output_path):
+            for filename in ["Brian_Engel_Resume.pdf", "Brian_Engel_Cover_Letter.pdf"]:
+                file_path = os.path.join(output_path, filename)
+                if os.path.isfile(file_path):
+                    try:
+                        os.remove(file_path)
+                    except Exception as e:
+                        print(f"Failed to delete {filename}: {e}")
+
+    def update_wraplengths(self, event=None):
+        width = self.analysis_info_frame.winfo_width()
+        print(f"Current frame width: {width}")
+        wrap_length = max(width - 20, 100)
+        for widget in self.analysis_info_frame.winfo_children():
+            if isinstance(widget, ttk.Label):
+                widget.configure(wraplength=wrap_length)

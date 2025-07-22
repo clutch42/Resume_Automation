@@ -49,10 +49,14 @@ class SkillManagerApp:
         # Create a frame inside the canvas to hold the notebook
         notebook_frame = tk.Frame(canvas)
         notebook_window = canvas.create_window((0, 0), window=notebook_frame, anchor="nw")
+        canvas.yview_moveto(0)
 
         # Update the scrollregion when the size of notebook_frame changes
         def on_frame_configure(event):
             canvas.configure(scrollregion=canvas.bbox("all"))
+            # Prevent scrolling above the top when content is short
+            if canvas.bbox("all")[3] <= canvas.winfo_height():
+                canvas.yview_moveto(0)
 
         notebook_frame.bind("<Configure>", on_frame_configure)
 

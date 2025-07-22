@@ -18,14 +18,15 @@ def _extract_all(job_description: str):
 
     print("📡 Calling OpenAI API")
     system_prompt = """You extract structured data from job descriptions.
-Return a raw JSON object (no markdown or backticks) with five keys:
+Return a raw JSON object (no markdown or backticks) with six keys:
 - 'company': the normalized name of the company (remove suffixes like Inc., LLC, Ltd., Corp., and any symbols such as ®, ™), or 'Not found' if not mentioned.
 - 'experience': minimum required experience as a string with unit of time, or 'Not found'
 - 'skills': a Python list of the skills mentioned, including technical skills such as programming languages, tools, frameworks, technologies, and software engineering and IT practices or methodologies.
 Do NOT include soft skills like communication, teamwork, leadership, or other interpersonal skills.
 - 'salary_range': the expected salary range mentioned in the description as a string (e.g., "$60,000 - $80,000", "€50k–€70k", "Not found" if not mentioned)
 - 'location': a concise sentence summarizing the work style (remote, hybrid, onsite) and any location or relocation requirements, or 'Not found' if not mentioned
-
+- 'unusual_aspects': any noteworthy, non-standard job requirements such as high travel expectations, advanced degrees, security clearance, relocation requirements, unusual working hours, etc. Return as a sentence or short paragraph summarizing these unusual aspects. Return 'Not found' if none are present.
+- 'company_description': a sentence describing what the company does, based on any available info in the job description. If not found, return 'Not found'.
 
 Example format:
 {
@@ -34,6 +35,8 @@ Example format:
     "skills": ["Python", "Django", "REST APIs", "Testing and Validation", "Troubleshooting and Debugging"],
     "salary_range": "$60,000 - $80,000",
     "location": "Hybrid role requiring presence in New York City offices, remote work allowed 2 days per week, relocation assistance provided."
+    "unusual_aspects": "Requires up to 60% international travel and active Secret-level security clearance."
+    "company_description": "A fintech startup building automated investment solutions for individuals and institutions."
 }
 """
 
@@ -72,6 +75,12 @@ def get_salary_range(job_description):
 
 def get_location(job_description):
     return _extract_all(job_description).get("location", "Not found")
+
+def get_unusual_aspects(job_description):
+    return _extract_all(job_description).get("unusual_aspects", "Not found")
+
+def get_company_description(job_description):
+    return _extract_all(job_description).get("company_description", "Not found")
 
 if __name__ == "__main__":
     print("Running test...")
