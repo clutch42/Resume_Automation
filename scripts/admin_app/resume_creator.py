@@ -22,6 +22,18 @@ MEDIUM_SPACE = 3
 BIG_SPACE = 6
 HUGE_SPACE = 12
 
+def make_add_pdf_metadata(skills):
+    def add_pdf_metadata(canvas, doc):
+        canvas.setTitle("Brian Engel's Resume")
+        canvas.setAuthor("Brian Engel")
+        canvas.setSubject("Professional Resume")
+        if skills:
+            keywords_str = "List of skills from the job posting: " + ", ".join(skills)
+        else:
+            keywords_str = "Resume, Professional, Skills, Experience"
+        canvas.setKeywords(keywords_str)
+    return add_pdf_metadata
+
 def create_resume_heading(personal_info, professional_title=None):
     styles = getSampleStyleSheet()
 
@@ -412,7 +424,8 @@ def create_resume_projects(projects):
 
     return flowables
 
-def generate_auto_resume(user_folder_path, job_data, output_pdf):
+def generate_auto_resume(user_folder_path, job_data, output_pdf, openai_skills):
+    skills = openai_skills or []
     professional_title = job_data.get("professional_title")
     matched_skills = job_data.get("matched_skills") or {}
     personal_info = load_personal_info(user_folder_path)
@@ -436,7 +449,7 @@ def generate_auto_resume(user_folder_path, job_data, output_pdf):
     doc = SimpleDocTemplate(output_pdf, pagesize=LETTER,
                             rightMargin=MARGINS, leftMargin=MARGINS,
                             topMargin=MARGINS, bottomMargin=MARGINS)
-    doc.build(story)
+    doc.build(story, onFirstPage=make_add_pdf_metadata(skills))
 
 def generate_resume(json_path, output_pdf):
     job_data = load_job_description(json_path)

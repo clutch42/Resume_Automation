@@ -137,10 +137,12 @@ class PDFGeneratorTab(BaseTab):
             return
 
         result = self.result_data or {}
-
+        job_description = self.text.get("1.0", "end").strip()
+        openai_skills = get_skills(job_description)
         filename = "Brian_Engel_Resume.pdf"
         full_output_path = os.path.join(output_path, filename)
-        generate_auto_resume(user_folder_path, result, full_output_path)
+        print(openai_skills)
+        generate_auto_resume(user_folder_path, result, full_output_path, openai_skills)
 
         professional_title = result.get("professional_title", "Engineer")
         company_name = result.get("company_name", "Hiring Manager")
