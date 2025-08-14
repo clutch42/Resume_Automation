@@ -103,9 +103,9 @@ def extract_skills_from_text(resume_text, skills_dict):
     from collections import defaultdict
 
     found_skills = defaultdict(list)
-    normalized_text = re.sub(r'(?<=\w)/(?=\w)', ' ', resume_text)
+    normalized_text = resume_text.replace('/', ' ').replace('(', ' ').replace(')', ' ')
     lowered_text = normalized_text.lower()
-    tokens = [w.strip('()",.:;') for w in lowered_text.split()]
+    tokens = [w.strip('",.:;') for w in lowered_text.split()]
 
     for category, skill_items in skills_dict.items():
         for item in skill_items:
