@@ -10,6 +10,7 @@ class SummariesTab(BaseTab):
         self.summaries = {}
         self.current_key = None
         self.current_file_path = None
+        self.skills_vars = {}
         self.build_ui()
 
     def build_ui(self):
@@ -36,17 +37,53 @@ class SummariesTab(BaseTab):
         self.cover_letter_text = tk.Text(self.frame, wrap="word", height=12)
         self.cover_letter_text.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
+        # In build_ui of SummariesTab
+        self.skills_frame = tk.Frame(self.frame)
+        self.skills_frame.pack(fill="x", pady=10)
+
+    def build_skills_categories_checkboxes(self, skills_data):
+        # Clear previous checkboxes if any
+        for widget in self.skills_frame.winfo_children():
+            widget.destroy()
+        
+        self.skills_vars = {}  # reset dictionary
+
+        for category in skills_data.keys():
+            var = tk.BooleanVar()
+            self.skills_vars[category] = var
+            cb = tk.Checkbutton(self.skills_frame, text=category, variable=var)
+            cb.pack(anchor="w", pady=2)
+
     def load_data(self, data):
         self.summaries = data
         self.dropdown["values"] = list(self.summaries.keys())
-        self.current_key = None
-        self.current_file_path = {"summary": None, "cover_letter": None}
-        self.summary_var.set("")
+
+        # Set current key and file
+        self.current_key = "default"
+        self.current_file = os.path.join(self.user_folder_path, "summaries.json")  # ensure on_select has a valid file
+        self.current_file_path = self.summaries[self.current_key]
+
+        # Set dropdown to default
+        self.summary_var.set("default")
+
+        # Clear text areas first
         self.text.delete("1.0", tk.END)
         if hasattr(self, "cover_letter_text"):
             self.cover_letter_text.delete("1.0", tk.END)
 
+        # Load the summary and cover letter
+        self.on_select()
+
+        # Load skills categories
+        skills_path = os.path.join(self.user_folder_path, "skills.json")
+        with open(skills_path, "r", encoding="utf-8") as f:
+            skills_data = json.load(f)
+        self.build_skills_categories_checkboxes(skills_data)
+
     def on_select(self, event=None):
+        if not self.current_file:
+            print("[DEBUG] on_select skipped — no file loaded yet")
+            return
         key = self.summary_var.get()
         if key and key in self.summaries:
             base_path = os.path.dirname(self.current_file)

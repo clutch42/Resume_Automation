@@ -110,6 +110,21 @@ class SkillManagerApp:
         # Layout resizing setup for root window
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
+        self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
+
+    def on_tab_changed(self, event):
+        selected_tab = event.widget.tab(event.widget.index("current"))["text"]
+        if selected_tab == "Summaries":
+            try:
+                if self.user_folder_path:  # Only if a user is loaded
+                    skills_path = os.path.join(self.user_folder_path, "skills.json")
+                    if os.path.exists(skills_path):
+                        with open(skills_path, "r", encoding="utf-8") as f:
+                            skills_data = json.load(f)
+                        self.summaries_tab.build_skills_categories_checkboxes(skills_data)
+            except Exception as e:
+                print(f"[DEBUG] Could not refresh skills categories: {e}")
+
 
     def load_json_file(self, path, tab, attribute_name, label):
         if os.path.exists(path):
@@ -132,6 +147,7 @@ class SkillManagerApp:
             return
         
         self.user_folder_path = folder
+        self.summaries_tab.user_folder_path = self.user_folder_path
         print(f"[DEBUG] User folder set to: {self.user_folder_path}")
 
         for filename, tab, attr, _ in self.files_to_load:
@@ -172,6 +188,9 @@ class SkillManagerApp:
         try:
             os.makedirs(user_folder, exist_ok=False)
 
+            self.user_folder_path = user_folder
+            self.summaries_tab.user_folder_path = self.user_folder_path
+
             for filename, tab_obj, file_attr, default_data in self.files_to_load:
                 path = os.path.join(user_folder, filename)
                 # Special handling for summaries.json
@@ -211,13 +230,15 @@ class SkillManagerApp:
 
                         summaries_with_paths[key] = {
                             "summary": summary_rel,
-                            "cover_letter": cover_rel
+                            "cover_letter": cover_rel, 
+                            "always_include_skills": []
                         }
 
                     # Always include default
                     summaries_with_paths["default"] = {
                         "summary": "summaries/default.txt",
-                        "cover_letter": "cover_letters/default.txt"
+                        "cover_letter": "cover_letters/default.txt",
+                        "always_include_skills": []
                     }
 
                     with open(path, "w", encoding="utf-8") as f:
