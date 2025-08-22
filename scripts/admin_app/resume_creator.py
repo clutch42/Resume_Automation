@@ -1,4 +1,4 @@
-import json
+import json, os
 from reportlab.lib.pagesizes import LETTER
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable, Table, TableStyle
@@ -117,7 +117,7 @@ def create_resume_summary(user_folder_path, professional_title):
 
     return flowables
 
-def create_resume_skills(matched_skills, skills_dict):
+def create_resume_skills(matched_skills, skills_dict, always_include_categories):
     styles = getSampleStyleSheet()
     
     heading_style = ParagraphStyle(
@@ -142,16 +142,17 @@ def create_resume_skills(matched_skills, skills_dict):
     
     for category, skill_objs in skills_dict.items():
         matched_names = set(matched_skills.get(category, []))
-        filled = list(matched_names)
+        if matched_names or category in always_include_categories:
+            filled = list(matched_names)
 
-        # Fill with unmatched skill names until reaching MAX
-        for skill in skill_objs:
-            name = skill["name"]
-            if name not in matched_names and len(filled) < MAX_SKILLS_PER_CATEGORY:
-                filled.append(name)
+            # Fill with unmatched skill names until reaching MAX
+            for skill in skill_objs:
+                name = skill["name"]
+                if name not in matched_names and len(filled) < MAX_SKILLS_PER_CATEGORY:
+                    filled.append(name)
 
-        line = f"<b>{category}:</b> {', '.join(filled)}"
-        flowables.append(Paragraph(line, line_style))
+            line = f"<b>{category}:</b> {', '.join(filled)}"
+            flowables.append(Paragraph(line, line_style))
 
     return flowables
 
@@ -426,7 +427,7 @@ def create_resume_projects(projects):
 
 def generate_auto_resume(user_folder_path, job_data, output_pdf, openai_skills):
     skills = openai_skills or []
-    professional_title = job_data.get("professional_title")
+    professional_title = job_data.get("professional_title") or "default"
     matched_skills = job_data.get("matched_skills") or {}
     personal_info = load_personal_info(user_folder_path)
     skills_dict = load_skills(user_folder_path)
@@ -434,13 +435,24 @@ def generate_auto_resume(user_folder_path, job_data, output_pdf, openai_skills):
     education_data = load_education(user_folder_path)
     certifications = load_certifications(user_folder_path)
     projects = load_projects(user_folder_path)
+    always_include_categories = []
+    summaries_path = os.path.join(user_folder_path, "summaries.json")
+    if os.path.exists(summaries_path):
+        with open(summaries_path, "r", encoding="utf-8") as f:
+            summaries_data = json.load(f)
+        if professional_title in summaries_data:
+            always_include_categories = summaries_data[professional_title].get(
+                "always_include_skills", []
+            )
+    print("DEBUG: matched_skills =", matched_skills)
+    print("DEBUG: always_include_categories =", always_include_categories)
 
     story = []
 
     # Add heading section flowables
     story.extend(create_resume_heading(personal_info, professional_title))
     story.extend(create_resume_summary(user_folder_path, professional_title))
-    story.extend(create_resume_skills(matched_skills, skills_dict))
+    story.extend(create_resume_skills(matched_skills, skills_dict, always_include_categories))
     story.extend(create_resume_experience(experience_data))
     story.extend(create_resume_education(education_data))
     story.extend(create_resume_certifications(certifications))
