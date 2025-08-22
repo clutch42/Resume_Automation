@@ -48,10 +48,20 @@ class SummariesTab(BaseTab):
         
         self.skills_vars = {}  # reset dictionary
 
+        # Grab the currently selected summary's always_include_skills
+        included_skills = []
+        if self.current_key and self.current_key in self.summaries:
+            included_skills = self.summaries[self.current_key].get("always_include_skills", [])
+
         for category in skills_data.keys():
-            var = tk.BooleanVar()
+            var = tk.BooleanVar(value=category in included_skills)
             self.skills_vars[category] = var
-            cb = tk.Checkbutton(self.skills_frame, text=category, variable=var)
+            cb = tk.Checkbutton(
+                self.skills_frame,
+                text=category, 
+                variable=var,
+                command=lambda c=category: self.on_skill_checkbox_toggle(c)
+            )
             cb.pack(anchor="w", pady=2)
 
     def load_data(self, data):
@@ -110,6 +120,11 @@ class SummariesTab(BaseTab):
             except Exception:
                 # It's valid to have no cover letter — just clear the field
                 self.cover_letter_text.delete("1.0", tk.END)
+            
+            # Sync checkboxes with always_include_skills
+            always_include = self.summaries[self.current_key].get("always_include_skills", [])
+            for category, var in self.skills_vars.items():
+                var.set(category in always_include)
 
     def add_summary(self):
         name = simpledialog.askstring("New Entry", "Enter label (e.g., 'Data Analyst'):")
@@ -207,9 +222,31 @@ class SummariesTab(BaseTab):
             with open(cover_path, "w", encoding="utf-8") as f:
                 f.write(cover_content)
 
-            messagebox.showinfo("Saved", f"Summary and cover letter for '{self.current_key}' saved.")
+            # Save the entire summaries JSON including always_include_skills
+            with open(self.current_file, "w", encoding="utf-8") as f:
+                json.dump(self.summaries, f, indent=2)
+
+            messagebox.showinfo("Saved", f"Summary, cover letter, and alway-include skills for '{self.current_key}' saved.")
         except Exception as e:
             messagebox.showerror("Error", f"Could not save files:\n{e}")
+
+    def on_skill_checkbox_toggle(self, category):
+        if not self.current_key or self.current_key not in self.summaries:
+            return
+
+        # Get the currently selected summary's always_include_skills
+        included_skills = self.summaries[self.current_key].get("always_include_skills", [])
+
+        # Update the list based on checkbox value
+        if self.skills_vars[category].get():
+            if category not in included_skills:
+                included_skills.append(category)
+        else:
+            if category in included_skills:
+                included_skills.remove(category)
+
+        # Save back to JSON dict
+        self.summaries[self.current_key]["always_include_skills"] = included_skills
 
     def get_data(self):
         return self.summaries
